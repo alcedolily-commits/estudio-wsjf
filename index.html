@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>Estudio de Requerimientos WSJF</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+[hidden] { display: none !important }
+/* Layout: workbench — structured ticket form on the left, live Jira output pinned on the right; tabs for backlog, simulation and guide */
+:root {
+  --bg: #F3F6F8; --surface: #FFFFFF; --sunk: #F7F9FA; --ink: #1B2733; --muted: #5B6977; --line: #DCE3E8;
+  --accent: #0B7A74; --accent-ink: #FFFFFF; --accent-soft: #E0F1EF;
+  --ok: #2B7A4B; --ok-soft: #E3F3E9; --warn: #9A6408; --warn-soft: #FBF0D9; --crit: #B93A33; --crit-soft: #F9E3E1;
+  --info: #2D5DB8; --info-soft: #E4ECFA; --violet: #6B4FC2; --violet-soft: #ECE7FA; --tip-bg: #1B2733; --tip-fg: #FFFFFF;
+  --f-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 10px; --shadow: 0 1px 2px rgba(20,40,60,.06), 0 4px 14px rgba(20,40,60,.05);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11171D; --surface: #19222B; --sunk: #151D25; --ink: #E5ECF2; --muted: #95A3B1; --line: #2A3641;
+  --accent: #3EBFB3; --accent-ink: #0C1B1A; --accent-soft: #173B39;
+  --ok: #67C28E; --ok-soft: #173326; --warn: #E3AE4C; --warn-soft: #3A2D12; --crit: #EE7D74; --crit-soft: #3D1E1C;
+  --info: #7FA6F0; --info-soft: #1A2A47; --violet: #A99AF0; --violet-soft: #2A2448; --tip-bg: #E5ECF2; --tip-fg: #11171D; --shadow: none; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11171D; --surface: #19222B; --sunk: #151D25; --ink: #E5ECF2; --muted: #95A3B1; --line: #2A3641;
+  --accent: #3EBFB3; --accent-ink: #0C1B1A; --accent-soft: #173B39;
+  --ok: #67C28E; --ok-soft: #173326; --warn: #E3AE4C; --warn-soft: #3A2D12; --crit: #EE7D74; --crit-soft: #3D1E1C;
+  --info: #7FA6F0; --info-soft: #1A2A47; --violet: #A99AF0; --violet-soft: #2A2448; --tip-bg: #E5ECF2; --tip-fg: #11171D; --shadow: none; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 14px/1.5 var(--f-ui); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px }
+.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 18px }
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px }
+.brand small { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 600 }
+.brand h1 { margin: 2px 0 0; font-size: 24px; line-height: 1.2; text-wrap: balance }
+.brand p { margin: 4px 0 0; color: var(--muted); max-width: 66ch }
+.status { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted) }
+.dot.on { background: var(--ok) } .dot.local { background: var(--warn) }
+nav.tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; overflow-x: auto; max-width: 100% }
+nav.tabs button { border: 0; background: transparent; color: var(--muted); font: 600 13px var(--f-ui); padding: 8px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap }
+nav.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink) }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, pre:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.panel { display: grid; gap: 18px }
+.work { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; align-items: start }
+@media (max-width: 980px) { .work { grid-template-columns: minmax(0, 1fr) } .out { position: static !important } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px 18px; min-width: 0 }
+.card h2 { font-size: 15px; margin: 0 0 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; position: relative }
+.step { font: 600 11px var(--f-mono); color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 2px 7px }
+.form { display: grid; gap: 14px }
+.grid { display: grid; gap: 10px 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) }
+.grid .wide { grid-column: 1 / -1 }
+label.f { display: grid; gap: 4px; font-size: 12px; font-weight: 600; color: var(--muted); min-width: 0; position: relative; align-content: start }
+label.f .lt { display: flex; align-items: center; gap: 6px }
+label.f span.h { font-weight: 400; font-size: 11.5px }
+.tip { flex: none; width: 17px; height: 17px; border-radius: 50%; border: 1px solid var(--line); background: var(--sunk); color: var(--muted); font: 700 10.5px var(--f-ui); padding: 0; cursor: help; line-height: 15px; text-align: center }
+.tip:hover, .tip:focus-visible { border-color: var(--accent); color: var(--accent) }
+.tip:hover::after, .tip:focus::after { content: attr(data-tip); position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--tip-bg); color: var(--tip-fg); padding: 8px 10px; border-radius: 8px; font: 400 12px/1.45 var(--f-ui); text-align: left; z-index: 15; box-shadow: 0 6px 18px rgba(0,0,0,.18); min-width: 0; white-space: normal }
+h2 .tip:hover::after, h2 .tip:focus::after { top: calc(100% + 6px); max-width: 520px }
+input, select, textarea { font: 14px var(--f-ui); color: var(--ink); background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0 }
+textarea { resize: vertical; min-height: 64px }
+input.code { font-family: var(--f-mono) }
+select.pending, input.pending { border-style: dashed; color: var(--muted) }
+.seg { display: flex; flex-wrap: wrap; gap: 6px }
+.seg button { flex: 1 1 92px; border: 1px solid var(--line); background: var(--sunk); color: var(--ink); border-radius: 8px; padding: 8px 6px; cursor: pointer; font: 500 13px var(--f-ui); text-align: center; line-height: 1.25 }
+.seg button b { display: block; font: 600 16px var(--f-mono) }
+.seg button small { color: var(--muted); font-size: 11px }
+.seg button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft) }
+.seg button.tbd { border-style: dashed }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px }
+.chip { border: 1px solid var(--line); background: var(--sunk); color: var(--ink); border-radius: 999px; padding: 3px 10px; font: 500 12px var(--f-ui); cursor: pointer }
+.chip:hover { border-color: var(--accent); color: var(--accent) }
+.rows { display: grid; gap: 8px }
+.rowx { display: grid; grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1.2fr) auto; gap: 8px; align-items: center }
+@media (max-width: 640px) { .rowx { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) } .rowx > :nth-child(3) { grid-column: 1 / -1 } }
+.calc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 13px var(--f-mono); color: var(--muted) }
+.calc strong { color: var(--ink) }
+.out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: grid; gap: 12px; max-height: calc(100vh - 24px); overflow: auto }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px }
+@media (max-width: 520px) { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.metric { background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0 }
+.metric span { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em }
+.metric b { font: 600 20px var(--f-mono); font-variant-numeric: tabular-nums }
+.pill { display: inline-flex; align-items: center; gap: 5px; font: 600 12px var(--f-ui); border-radius: 999px; padding: 3px 10px; white-space: nowrap }
+.p-rapida { background: var(--ok-soft); color: var(--ok) } .p-agil { background: var(--info-soft); color: var(--info) } .p-completa { background: var(--warn-soft); color: var(--warn) } .p-none { background: var(--sunk); color: var(--muted); border: 1px solid var(--line) }
+.alerts { display: grid; gap: 6px }
+.alert { border-radius: 8px; padding: 8px 10px; font-size: 13px; display: flex; gap: 8px }
+.alert b { flex: none }
+.a-crit { background: var(--crit-soft); color: var(--crit) } .a-warn { background: var(--warn-soft); color: var(--warn) } .a-info { background: var(--info-soft); color: var(--info) } .a-ok { background: var(--ok-soft); color: var(--ok) }
+.next { font-size: 13px } .next b { color: var(--accent) }
+.fmt { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--muted) }
+.fmt select { width: auto }
+.box { border: 1px solid var(--line); border-radius: 8px; background: var(--sunk); min-width: 0 }
+.box .bh { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--muted) }
+.box pre { margin: 0; padding: 10px 12px; font: 12.5px/1.55 var(--f-mono); white-space: pre-wrap; word-break: break-word; max-height: 380px; overflow: auto }
+.box .sum { padding: 10px 12px; font: 600 13px var(--f-mono); word-break: break-word }
+.btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 13px var(--f-ui); border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap }
+.btn:hover { border-color: var(--accent) }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.btn.sm { padding: 4px 9px; font-size: 12px }
+.btn.danger { color: var(--crit) }
+.btn.ghost { border-style: dashed; color: var(--accent) }
+.actions { display: flex; flex-wrap: wrap; gap: 8px }
+.ex { font-size: 12px; background: var(--violet-soft); color: var(--violet); border-radius: 999px; padding: 3px 10px; font-weight: 600 }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; z-index: 20; max-width: calc(100% - 32px) }
+.tbl { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-size: 13px }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle }
+th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; background: var(--sunk) }
+td.num, th.num { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums }
+td.code { font: 600 12.5px var(--f-mono); white-space: nowrap }
+td select { width: auto; padding: 4px 6px; font-size: 12.5px }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between }
+.toolbar .l { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.toolbar input, .toolbar select { width: auto }
+.empty { text-align: center; color: var(--muted); padding: 28px 12px }
+.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 900px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+@media (max-width: 520px) { .board { grid-template-columns: minmax(0, 1fr) } }
+.col { background: var(--sunk); border: 1px solid var(--line); border-radius: var(--r); padding: 10px; display: grid; gap: 8px; align-content: start; min-width: 0 }
+.col h3 { margin: 0; font-size: 13px; display: flex; justify-content: space-between }
+.col h3 em { font-style: normal; font-family: var(--f-mono); color: var(--muted) }
+.col p.rule { margin: 0; font-size: 11.5px; color: var(--muted) }
+.tk { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: grid; gap: 4px; font-size: 12.5px }
+.tk .row { display: flex; justify-content: space-between; gap: 6px; align-items: center }
+.tk code { font: 600 11.5px var(--f-mono) }
+.c-wait { border-top: 3px solid var(--muted) } .c-split { border-top: 3px solid var(--crit) } .c-prio { border-top: 3px solid var(--info) } .c-ready { border-top: 3px solid var(--ok) }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end }
+.controls label.f { min-width: 160px }
+.bars { display: grid; gap: 6px }
+.bar { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr) 44px; gap: 10px; align-items: center; font-size: 12.5px }
+.bar .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.bar .track { height: 12px; background: var(--sunk); border: 1px solid var(--line); border-radius: 6px; overflow: hidden }
+.bar .fill { height: 100%; background: var(--accent); border-radius: 6px }
+.bar .fill.mute { background: var(--muted); opacity: .5 }
+.bar b { font-family: var(--f-mono); text-align: right }
+@media (max-width: 520px) { .bar { grid-template-columns: minmax(0, 1fr) 44px } .bar .track { grid-column: 1 / -1; order: 3 } }
+.guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px }
+.raci td.r, .raci td.a, .raci td.c, .raci td.i { text-align: center; font: 600 12.5px var(--f-mono) }
+.raci td.a { background: var(--warn-soft); color: var(--warn) } .raci td.r { background: var(--accent-soft); color: var(--accent) } .raci td.c { background: var(--info-soft); color: var(--info) } .raci td.i { color: var(--muted) }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); margin-top: 10px }
+ul.clean { margin: 0; padding-left: 18px; display: grid; gap: 4px }
+.muted { color: var(--muted) }
+.inline-confirm { display: inline-flex; gap: 6px; align-items: center; font-size: 12px }
+.sub { margin: 4px 0 8px; font-size: 12px; color: var(--muted) }
+.rub { margin: 2px 0 0; font-size: 12px; font-weight: 400; color: var(--ink); background: var(--accent-soft); border-radius: 6px; padding: 6px 8px; line-height: 1.4 }
+.rub.empty { background: var(--sunk); color: var(--muted) }
+.rub b { color: var(--accent) }
+details.scale { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--sunk) }
+details.scale summary { cursor: pointer; padding: 8px 12px; font-size: 13px; font-weight: 600; color: var(--accent) }
+details.scale .tbl { padding: 0 8px 8px }
+table.rubt td, table.rubt th { font-size: 12px; vertical-align: top }
+table.rubt td:first-child { font: 600 13px var(--f-mono); text-align: center; white-space: nowrap }
+table.rubt td.lvl { font-weight: 600; white-space: nowrap }
+.ctxbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px }
+.ctxcode { font: 600 15px var(--f-mono); word-break: break-word }
+.qlist { display: grid; gap: 6px }
+.qcer { margin: 10px 0 2px; font: 600 11.5px var(--f-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--accent) }
+.q { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--sunk) }
+.q.done { border-color: var(--accent); background: var(--accent-soft) }
+.q input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent) }
+.q .qb { display: grid; gap: 3px; min-width: 0 }
+.q .qb label { font-weight: 600; font-size: 13px; cursor: pointer }
+.q .qb small { color: var(--muted); font-size: 11.5px }
+.q .qb input { margin-top: 4px; padding: 6px 8px; font-size: 13px; background: var(--surface) }
+.dlist { display: grid; gap: 6px }
+.dck { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 13px; cursor: pointer }
+.dck input { width: 16px; height: 16px; accent-color: var(--accent) }
+.dck em { font: 600 12px var(--f-mono); font-style: normal; color: var(--muted) }
+.meter { height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; margin-top: 6px }
+.meter div { height: 100%; background: var(--accent); width: 0 }
+.nlist { display: grid; gap: 6px; max-height: 520px; overflow: auto }
+.nitem { display: grid; gap: 2px; text-align: left; border: 1px solid var(--line); background: var(--sunk); color: var(--ink); border-radius: 8px; padding: 8px 10px; cursor: pointer; font: 13px var(--f-ui) }
+.nitem.on { border-color: var(--accent); background: var(--accent-soft) }
+.nitem small { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.nitem em { font-style: normal; font-size: 11px; color: var(--muted) }
+.login { position: fixed; inset: 0; background: var(--bg); z-index: 30; display: grid; place-items: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px }
+.lgcard { width: min(420px, 100%); display: grid; gap: 4px }
+.sdlc { display: grid; gap: 8px }
+.sdrow { display: grid; grid-template-columns: minmax(0, 1.3fr) 130px minmax(0, .9fr) minmax(0, 1.2fr); gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--sunk) }
+.sdrow.ok { border-color: var(--ok); background: var(--ok-soft) } .sdrow.na { opacity: .6 }
+.sdrow b { font-size: 13px; display: block } .sdrow small { color: var(--muted); font-size: 11.5px; display: block }
+.sdrow select, .sdrow input { padding: 6px 8px; font-size: 13px; background: var(--surface) }
+@media (max-width: 720px) { .sdrow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) } .sdrow > :first-child { grid-column: 1 / -1 } .sdrow > :last-child { grid-column: 1 / -1 } }
+.snap { border: 1px dashed var(--accent); border-radius: 8px; padding: 10px 12px; background: var(--accent-soft) }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600 }
+.tagx { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--ink); border-radius: 999px; padding: 3px 4px 3px 10px; font-size: 12.5px }
+.tagx button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font: 700 14px var(--f-ui); width: 20px; height: 20px; border-radius: 50%; padding: 0 }
+.tagx button:hover { background: var(--surface); color: var(--crit) }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <small>Empresa · Producto y Desarrollo</small>
+      <h1>Estudio de Requerimientos WSJF</h1>
+      <p style="margin:2px 0 0;font-weight:600;color:var(--ink)">De la iniciativa al ticket listo para Jira</p>
+      <p style="margin-top:6px">Llena la ficha por bloques; lo que aún no sepas, déjalo «Por definir». La herramienta calcula el puntaje WSJF, la vía y el siguiente paso, y arma el texto listo para pegar en Jira.</p>
+    </div>
+    <div class="status"><span class="dot" id="dot"></span><span id="statusTxt">Conectando…</span><button type="button" class="btn sm primary" id="btnLogin" hidden>Empezar a guardar</button><button type="button" class="btn sm" id="btnLogout" hidden>Cerrar sesión</button></div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button role="tab" id="tab-nuevo" aria-selected="true" data-tab="nuevo">Ficha y texto Jira</button>
+    <button role="tab" id="tab-disc" aria-selected="false" data-tab="disc">Discovery y Delivery</button>
+    <button role="tab" id="tab-backlog" aria-selected="false" data-tab="backlog">Backlog y ranking</button>
+    <button role="tab" id="tab-sim" aria-selected="false" data-tab="sim">Simulación</button>
+    <button role="tab" id="tab-guia" aria-selected="false" data-tab="guia">Guía y RACI</button>
+    <button role="tab" id="tab-init" aria-selected="false" data-tab="init">Iniciativa</button>
+    <button role="tab" id="tab-notas" aria-selected="false" data-tab="notas">Notas</button>
+  </nav>
+
+  <!-- ============ FICHA ============ -->
+  <section class="panel" id="p-nuevo">
+    <div class="work">
+      <form class="form" id="f" autocomplete="off">
+        <div class="card">
+          <h2 data-tip="Datos que identifican el ticket en Jira. El código se arma solo con el tipo, el área y el correlativo."><span class="step">1</span> Identificación <span class="ex" id="exTag">Ejemplo cargado</span></h2>
+          <div class="grid">
+            <label class="f" data-tip="Tipo de requerimiento (Issue Type en Jira). Historia, Mejora y Regulatorio compiten en el ranking WSJF; el resto se atiende por severidad, SLA o cupo.">Tipo<select id="tipo"></select></label>
+            <label class="f" data-tip="Área principal que solicita el cambio. Define el código del ticket y es el Componente principal en Jira.">Área principal<select id="area"></select></label>
+            <label class="f" data-tip="Número consecutivo por área. Se propone solo según tu backlog; puedes cambiarlo.">Correlativo<input id="corr" class="code" inputmode="numeric" maxlength="3"></label>
+            <label class="f" data-tip="Código final TIPO-ÁREA-NNN. No cambia aunque cambie la prioridad.">Código<input id="codigo" class="code" readonly></label>
+            <label class="f wide" data-tip="Resumen del ticket en Jira. Verbo en infinitivo + objeto + resultado, máximo 10 palabras. Ej.: Enviar alertas de vencimiento para reducir la mora.">Título<input id="titulo" maxlength="120"></label>
+            <label class="f wide" data-tip="Si el requerimiento involucra a más áreas, márcalas. El código usa el área principal; las demás se registran como componentes adicionales en Jira.">Otras áreas involucradas<input type="hidden" id="areasExtra"><div class="chips" id="areasPick"></div></label>
+            <label class="f" data-tip="Sistema donde se implementa: Factoring Admin (operación interna), Public (canal del cliente), Ambos, o Transversal si toca varios sistemas o servicios compartidos.">Sistema<select id="sistema"></select></label>
+            <label class="f" id="otroWrap" data-tip="Nombre del sistema cuando no es Factoring Admin ni Public." hidden>Otro sistema<input id="sistemaOtro"></label>
+            <label class="f" data-tip="Producto o squad dueño (FAC, HIP, CAM…). Se agrega como etiqueta en Jira.">Producto / squad<input id="producto"></label>
+            <label class="f" data-tip="Etapa actual del ticket en el tablero Scrumban.">Estado<select id="estado"></select></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Quién registra y quién lleva el ticket. El Product Manager es el Informador (crea el ticket); PO y Tech Lead son responsables según la etapa."><span class="step">2</span> Responsables</h2>
+          <div class="grid">
+            <label class="f" data-tip="Product Manager que crea el ticket en Jira (Reporter).">Informador · Product Manager<input id="pm"></label>
+            <label class="f" data-tip="Product Owner responsable de la historia, los criterios y la priorización.">Product Owner<input id="po"></label>
+            <label class="f" data-tip="Tech Lead responsable de la talla, la solución técnica y los criterios no funcionales.">Tech Lead<input id="tl"></label>
+            <label class="f" data-tip="Persona del área que valida el alcance y la entrega.">Contacto del área<input id="contacto"></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Para qué existe el ticket y qué tan urgente es. Esto alimenta el costo de retraso."><span class="step">3</span> Objetivo y urgencia</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Una o dos frases con el propósito del ticket: qué cambia para el negocio o el cliente cuando esté listo.">Objetivo del ticket<textarea id="objetivo" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Qué pasa hoy, a quién afecta y con qué frecuencia. Usa datos si los tienes.">Problema u oportunidad<textarea id="problema" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Indicador medible que dirá si funcionó. Ej.: −10% de mora a 30 días en 3 meses.">Resultado esperado (KPI)<input id="kpi"></label>
+            <label class="f" data-tip="Qué tan rápido lo necesita el negocio. Crítica = impacto grave o regulatorio inmediato; Alta = este mes; Media = este trimestre; Baja = cuando haya capacidad.">Nivel de urgencia<select id="urgencia"></select></label>
+            <label class="f" data-tip="Regla de atención en el tablero: Urgente salta la cola; Fecha fija tiene plazo; Estándar entra por WSJF; Intangible usa cupo fijo.">Clase de servicio<select id="clase"></select></label>
+            <label class="f" data-tip="Solo si existe un plazo real (regulador, campaña, contrato). Explica el motivo en el objetivo.">Fecha límite<input id="fecha" type="date"></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="La historia en formato estándar y los límites claros de lo que se hará y lo que no."><span class="step">4</span> Historia y alcance</h2>
+          <div class="grid">
+            <label class="f" data-tip="Quién usa la funcionalidad: un cliente, un analista de operaciones, un inversionista…">Como (rol)<input id="como"></label>
+            <label class="f" data-tip="Qué acción o capacidad necesita.">Quiero<input id="quiero"></label>
+            <label class="f" data-tip="Qué beneficio obtiene. Une la historia con el objetivo.">Para<input id="para"></label>
+            <label class="f wide" data-tip="Lo que sí entra en esta entrega. Uno por línea.">Alcance · incluye<textarea id="incluye" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Lo que queda fuera para evitar malentendidos. Uno por línea. Puedes usar MoSCoW: lo Won't va aquí.">Alcance · no incluye<textarea id="noIncluye" rows="2"></textarea></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Dónde impacta el cambio. Ayuda al Tech Lead a estimar y a Validación a planificar pruebas."><span class="step">5</span> Módulos y vistas</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Módulos del sistema que se modifican, separados por coma. Ej.: Cobranzas, Notificaciones.">Módulos afectados<input id="modulos"></label>
+            <label class="f wide" data-tip="Vistas principales donde se ve el cambio, una por línea con la ruta: Sistema > Módulo > Vista. El detalle visual va en Figma.">Vistas que aplican (principales)<textarea id="vistas" rows="3"></textarea></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Cómo debe comportarse la funcionalidad. Aquí van solo los criterios principales; el detalle de interfaz vive en Figma."><span class="step">6</span> Reglas y criterios funcionales</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Condiciones del negocio que el sistema debe respetar, una por línea. Se numeran solas como RN-01, RN-02…">Reglas de negocio<textarea id="reglas" rows="3"></textarea></label>
+            <label class="f wide" data-tip="Criterios de aceptación en Gherkin. Escribe cada escenario en líneas: Escenario:, Dado, Y, Cuando, Entonces. También puedes escribir uno por línea «Dado…, cuando…, entonces…» y el Estudio lo convierte a Gherkin. Solo lo esencial; lo visual va en Figma.">Criterios funcionales principales (Gherkin)<textarea id="criterios" rows="7" spellcheck="false" style="font-family:var(--f-mono);font-size:12.5px" placeholder="Escenario: Recordatorio a cuota por vencer&#10;  Dado una cuota que vence en 3 días&#10;  Cuando corre el proceso diario&#10;  Entonces el cliente recibe correo y SMS"></textarea><small class="muted" id="ghkInfo"></small></label>
+            <label class="f" data-tip="Enlace al diseño en Figma, si existe.">Enlace a Figma<input id="figma" type="url" placeholder="https://www.figma.com/…"></label>
+            <label class="f" data-tip="Enlace al prototipo navegable, si existe.">Enlace al prototipo<input id="prototipo" type="url" placeholder="https://…"></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Atributos de calidad: rendimiento, seguridad, auditoría, disponibilidad. Separa lo que pide negocio de lo que indica el Tech Lead."><span class="step">7</span> Criterios no funcionales</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Lo que negocio sugiere: tiempos de respuesta, mensajes, horarios, accesibilidad… Uno por línea.">Sugeridos por negocio<textarea id="nfNeg" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Lo que el Tech Lead indica: rendimiento, seguridad, logs, reintentos, compatibilidad… Uno por línea.">Mencionados por el Tech Lead<textarea id="nfTl" rows="2"></textarea></label>
+          </div>
+          <p class="sub">Agregar rápido al Tech Lead:</p>
+          <div class="chips" id="nfChips"></div>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Cómo se calcula hoy y cómo debe calcularse. Incluye fórmulas y un ejemplo numérico; adjunta las simulaciones en Excel como anexo."><span class="step">8</span> Lógica de cálculo y anexos</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Proceso o fórmula actual, aunque sea manual. Ej.: Cobranzas revisa un reporte y llama a cada cliente.">Cómo funciona hoy<textarea id="calcHoy" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Fórmula o lógica esperada, con nombres de campos. Ej.: fecha_envío = fecha_vencimiento − N días.">Cómo debe funcionar<textarea id="calcNuevo" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Un caso con números reales o ficticios que muestre entrada y resultado esperado.">Ejemplo numérico<textarea id="calcEj" rows="2"></textarea></label>
+          </div>
+          <p class="sub" style="font-weight:600">Anexos (simulaciones, fórmulas, documentos)</p>
+          <div class="rows" id="anexos"></div>
+          <button type="button" class="btn sm ghost" id="addAnexo" style="margin-top:8px">+ Agregar anexo</button>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Lo que debe existir antes o en paralelo, y las grabaciones de las ceremonias donde se acordó el ticket."><span class="step">9</span> Dependencias y videos</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Otros equipos, tickets, proveedores, datos o accesos de los que depende. Uno por línea.">Dependencias<textarea id="deps" rows="2"></textarea></label>
+          </div>
+          <p class="sub" style="font-weight:600">Videos de las ceremonias</p>
+          <div class="rows" id="videos"></div>
+          <button type="button" class="btn sm ghost" id="addVideo" style="margin-top:8px">+ Agregar video</button>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Etiquetas para encontrar y agrupar tickets en Jira. Si necesitas una etiqueta nueva, propónla con su motivo para que se apruebe."><span class="step">10</span> Etiquetas</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Etiquetas existentes adicionales, separadas por coma. Las de producto, vía y WSJF se agregan solas.">Etiquetas adicionales<input id="tagsExtra" placeholder="cobranza, notificaciones"></label>
+          </div>
+          <p class="sub" style="font-weight:600">Propuesta de nuevas etiquetas o nomenclaturas</p>
+          <div class="rows" id="tagsNew"></div>
+          <button type="button" class="btn sm ghost" id="addTag" style="margin-top:8px">+ Proponer etiqueta</button>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Puntaje del ticket. Negocio estima el costo de retraso (valor, criticidad, riesgo); el equipo técnico estima el tamaño. WSJF = CoD ÷ tamaño."><span class="step">11</span> Puntaje WSJF</h2>
+          <div class="grid">
+            <label class="f" data-tip="Impacto en ingresos, clientes, inversionistas o eficiencia. Elige el nivel cuya descripción se parezca más al ticket; compara con otros tickets del backlog.">Valor de negocio<select id="valor"></select><p class="rub" id="h-valor"></p></label>
+            <label class="f" data-tip="Cuánto se pierde si se posterga: plazos legales, campañas, ventanas de mercado. Pregunta: ¿qué pasa si esto se hace en 3 meses en vez de ahora?">Criticidad temporal<select id="crit"></select><p class="rub" id="h-crit"></p></label>
+            <label class="f" data-tip="Cuánto reduce un riesgo (operativo, regulatorio, de fraude, técnico) o qué otro trabajo desbloquea.">Riesgo / Oportunidad<select id="riesgo"></select><p class="rub" id="h-riesgo"></p></label>
+            <label class="f wide" data-tip="Explica en una o dos frases por qué elegiste esos puntajes: datos, plazos, comparación con otro ticket. Ayuda a defender el puntaje en la ceremonia.">Justificación adicional del puntaje<textarea id="justif" rows="2" placeholder="Ej.: la mora a 30 días subió 4 puntos en el último trimestre; puntuamos igual que el ticket de reprogramaciones."></textarea></label>
+          </div>
+          <details class="scale"><summary>Ver la escala completa: qué significa cada valor</summary><div class="tbl" id="scaleCard"></div></details>
+          <p class="muted" style="margin:12px 0 6px;font-size:12px;font-weight:600">Tamaño (talla del Tech Lead o resultado de Planning Poker)</p>
+          <div class="seg" id="tallas" role="group" aria-label="Tamaño"></div>
+          <p class="calc" id="calcLine" style="margin:12px 0 0"></p>
+        </div>
+
+        <div class="card">
+          <h2 data-tip="Especificaciones del ciclo de vida del desarrollo (SDLC): qué documento o entregable define cada fase, en qué estado está, quién lo lleva y dónde vive. Marca «No aplica» si la fase no corresponde al ticket."><span class="step">12</span> Especificaciones SDLC <span class="pill p-none" id="sdlcProg"></span></h2>
+          <div class="sdlc" id="sdlc"></div>
+        </div>
+      </form>
+
+      <aside class="out">
+        <div class="card" style="display:grid;gap:12px">
+          <div class="metrics">
+            <div class="metric"><span>CoD</span><b id="mCod">–</b></div>
+            <div class="metric"><span>WSJF</span><b id="mWsjf">–</b></div>
+            <div class="metric"><span>Vía</span><b style="font-size:14px" id="mVia">–</b></div>
+            <div class="metric"><span>DoR</span><b id="mDor">–</b></div>
+          </div>
+          <div class="alerts" id="alerts"></div>
+          <div class="next" id="next"></div>
+        </div>
+        <div class="card" style="display:grid;gap:10px">
+          <div class="fmt"><label for="fmt">Formato</label>
+            <select id="fmt"><option value="md">Jira Cloud (Markdown)</option><option value="wiki">Jira Server / Data Center (wiki)</option><option value="txt">Texto plano</option></select>
+          </div>
+          <div class="box"><div class="bh">Resumen (Summary) <button type="button" class="btn sm" id="cpSum">Copiar</button></div><div class="sum" id="outSum"></div></div>
+          <div class="box"><div class="bh">Descripción <button type="button" class="btn sm" id="cpDesc">Copiar</button></div><pre id="outDesc" tabindex="0"></pre></div>
+          <div class="box"><div class="bh">Campos sugeridos en Jira</div><div class="sum" id="outFields" style="font-weight:400"></div></div>
+          <div class="actions">
+            <button type="button" class="btn primary" id="btnSave">Guardar en backlog</button>
+            <button type="button" class="btn" id="btnDocx">Descargar Word</button>
+            <button type="button" class="btn" id="btnTxt">Descargar .txt</button>
+            <button type="button" class="btn" id="btnNew">Nueva ficha</button>
+          </div>
+          <button type="button" class="btn" id="btnSnap" style="border-color:var(--accent);color:var(--accent)">Ticket completo de esta reunión</button>
+          <div class="snap" id="snapPanel" hidden>
+            <p class="sub" style="margin:0 0 6px;font-weight:600;color:var(--ink)">Versión del ticket al cierre de la reunión</p>
+            <div class="grid">
+              <label class="f" data-tip="Reunión en la que se refinó el ticket. Queda como nombre de la versión en el historial.">Reunión<select id="snapCer"></select></label>
+              <label class="f" data-tip="Qué cambió o qué se acordó en esta reunión, en una línea. Aparece en el historial y en el texto.">Nota de la versión<input id="snapNote" placeholder="Ej.: se definieron reglas y tamaño Minor"></label>
+              <label class="f wide" data-tip="Quiénes participaron. Sepáralos con comas.">Asistentes<input id="actaAsis" placeholder="PM, PO, Tech Lead, Jefatura de Cobranzas"></label>
+              <label class="f wide" data-tip="Acuerdos adicionales, uno por línea. Las respuestas de Discovery y Delivery de esta reunión se agregan solas al acta.">Acuerdos adicionales<textarea id="actaAcu" rows="2"></textarea></label>
+              <label class="f wide" data-tip="Tareas pendientes, una por línea con el formato: tarea | responsable | fecha.">Pendientes<textarea id="actaPend" rows="2" placeholder="Enviar Excel de simulación | Cobranzas | 21/10"></textarea></label>
+              <label class="f" data-tip="Si en la reunión cambió lo que entra o no entra en la entrega. La herramienta además detecta cambios de alcance contra la versión anterior.">¿Hubo cambio de alcance?<select id="actaAlc"><option>No</option><option>Sí — se amplía</option><option>Sí — se reduce</option><option>Sí — se modifica</option></select></label>
+              <label class="f" data-tip="Quién aprobó el cambio de alcance (normalmente el PM con el sponsor).">Aprobado por<input id="actaApr"></label>
+              <label class="f wide" id="actaDetWrap" data-tip="Qué cambió del alcance y por qué; indica el impacto en fecha, esfuerzo o puntaje si se conversó.">Detalle del cambio e impacto<textarea id="actaAlcDet" rows="2"></textarea></label>
+            </div>
+            <div class="actions" style="margin-top:8px"><button type="button" class="btn primary sm" id="snapGo">Guardar versión y copiar ticket</button><button type="button" class="btn primary sm" id="btnActa">Generar acta para correo</button><button type="button" class="btn sm" id="snapDocx">Word del ticket</button><button type="button" class="btn sm" id="snapCancel">Cerrar</button></div>
+            <div id="actaOut" hidden style="display:grid;gap:8px;margin-top:10px">
+              <div class="box"><div class="bh">Asunto <button type="button" class="btn sm" id="cpActaSub">Copiar</button></div><div class="sum" id="actaSub"></div></div>
+              <div class="box"><div class="bh">Cuerpo del correo <button type="button" class="btn sm" id="cpActaBody">Copiar</button></div><pre id="actaBody" tabindex="0"></pre></div>
+              <div class="actions"><button type="button" class="btn sm" id="actaTxt">Descargar .txt</button><button type="button" class="btn sm" id="actaDocx">Descargar Word</button></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ DISCOVERY Y DELIVERY ============ -->
+  <section class="panel" id="p-disc" hidden>
+    <div class="card ctxbar">
+      <div style="min-width:0"><small class="muted">Trabajando sobre el ticket de la ficha</small><div id="discCtx" class="ctxcode"></div></div>
+      <div class="actions" style="align-items:center">
+        <label class="f" style="min-width:220px" data-tip="Muestra solo las preguntas de la ceremonia que vas a tener con los stakeholders.">Ceremonia<select id="discCer"><option value="">Todas</option><option value="C1">C1 · Presentación de la necesidad</option><option value="C2">C2 · Revisión funcional</option><option value="C3">C3 · Refinamiento técnico</option><option value="C4">C4 · Validación y priorización</option><option value="Kickoff">Kickoff</option></select></label>
+        <span id="discProg" class="pill p-none"></span>
+      </div>
+    </div>
+    <div class="work">
+      <div class="form">
+        <div id="discQ" class="form"></div>
+        <div class="card">
+          <h2 data-tip="Agrega preguntas propias de este ticket. Se guardan con el ticket y salen en el texto de Jira cuando tienen respuesta.">Agregar pregunta propia</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Escribe la pregunta tal como se la harás al stakeholder.">Pregunta<input id="newQ"></label>
+            <label class="f" data-tip="En qué ceremonia la vas a hacer.">Ceremonia<select id="newQCer"><option value="C1">C1</option><option value="C2" selected>C2</option><option value="C3">C3</option><option value="C4">C4</option><option value="Kickoff">Kickoff</option></select></label>
+          </div>
+          <button type="button" class="btn sm ghost" id="addQ" style="margin-top:10px">+ Agregar pregunta</button>
+        </div>
+      </div>
+      <aside class="out">
+        <div class="card">
+          <h2 data-tip="Marca lo que aplica. Suma puntos: 3 o más significa que necesita diseñador en Figma; 1 a 2, consultar con diseño; 0 o menos, no lo necesita.">¿Necesita diseñador (Figma)?</h2>
+          <div id="designList" class="dlist"></div>
+          <div id="designRes" style="margin-top:10px"></div>
+        </div>
+        <div class="card" id="aiTicket">
+          <h2 data-tip="La IA lee la ficha actual y tus respuestas. Elige una consulta sugerida o escribe la tuya. Con «Agregar a la ficha» pasas el resultado al campo correspondiente.">Consultar a la IA</h2>
+          <p class="sub" style="margin:0 0 6px">Consultas sugeridas</p>
+          <div class="chips aiBtns"></div>
+          <label class="f" style="margin-top:10px" data-tip="Pregunta libre sobre este ticket. Ej.: ¿qué riesgos regulatorios debería revisar con Cumplimiento?">Tu consulta<textarea class="aiQ" id="aiQ" rows="2"></textarea></label>
+          <div class="actions" style="margin-top:8px"><button type="button" class="btn sm aiFree">Consultar</button><button type="button" class="btn sm aiStop" hidden>Detener</button></div>
+          <div class="box" style="margin-top:10px"><div class="bh">Respuesta <span class="actions"><button type="button" class="btn sm aiUse" hidden>Agregar a la ficha</button><button type="button" class="btn sm aiCopy">Copiar</button><button type="button" class="btn sm aiCopyPrompt" hidden>Copiar prompt</button></span></div><pre class="aiOut" tabindex="0">Elige una consulta sugerida para empezar.</pre></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ BACKLOG ============ -->
+  <section class="panel" id="p-backlog" hidden>
+    <div class="card">
+      <div class="toolbar">
+        <div class="l">
+          <input id="q" type="search" placeholder="Buscar código o título" aria-label="Buscar">
+          <select id="fVia" aria-label="Filtrar por vía"><option value="">Todas las vías</option><option>Express</option><option>Focus</option><option>Strategic</option></select>
+          <select id="fEstado" aria-label="Filtrar por estado"><option value="">Todos los estados</option></select>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="expDocx">Word del backlog</button>
+          <button type="button" class="btn" id="expTxt">.txt del backlog</button>
+          <button type="button" class="btn" id="expCsv">CSV para importar en Jira</button>
+        </div>
+      </div>
+    </div>
+    <div class="card tbl" id="blWrap"></div>
+    <div class="card tbl" id="histWrap" hidden></div>
+  </section>
+
+  <!-- ============ SIMULACIÓN ============ -->
+  <section class="panel" id="p-sim" hidden>
+    <div class="card">
+      <h2>Simulación de priorización</h2>
+      <p class="muted" style="margin:0 0 14px;max-width:80ch">Aplica las reglas del proceso a un conjunto de tickets: filtro de CoD en la ceremonia 1, división de los Large Scale en la ceremonia 3 y corte por capacidad de WIP en la ceremonia 4. Cambia los parámetros y mira cómo se mueve cada ticket.</p>
+      <div class="controls">
+        <label class="f">Origen<select id="sSrc"><option value="ej">Ejemplos del caso</option><option value="bl">Mi backlog</option></select></label>
+        <label class="f">Umbral de CoD (filtro C1): <b id="sUmbV"></b><input id="sUmb" type="range" min="3" max="30" step="1"></label>
+        <label class="f">Cupo de WIP del ciclo: <b id="sCupV"></b><input id="sCup" type="range" min="1" max="8" step="1"></label>
+      </div>
+    </div>
+    <div class="board" id="board"></div>
+    <div class="card"><h2>Ranking WSJF de la simulación</h2><div class="bars" id="bars"></div><p class="muted" id="simSum" style="margin:12px 0 0;font-size:13px"></p></div>
+  </section>
+
+  <!-- ============ GUÍA ============ -->
+  <section class="panel" id="p-guia" hidden>
+    <div class="card tbl">
+      <h2>Matriz RACI del proceso</h2>
+      <table class="raci" id="raci"></table>
+      <div class="legend"><span><b>R</b> Responsable: ejecuta</span><span><b>A</b> Aprobador: rinde cuentas (uno por actividad)</span><span><b>C</b> Consultado: aporta antes</span><span><b>I</b> Informado: se entera después</span><span>Informador del ticket en Jira: Product Manager</span></div>
+    </div>
+    <div class="guide">
+      <div class="card"><h2>Estructura del ticket</h2><ul class="clean"><li>Objetivo, contexto y urgencia</li><li>Historia de usuario y alcance (incluye / no incluye)</li><li>Sistema, módulos y vistas principales</li><li>Reglas de negocio y criterios funcionales en Gherkin (Escenario / Dado / Cuando / Entonces)</li><li>Figma y prototipo para el detalle visual</li><li>Criterios no funcionales (negocio y Tech Lead)</li><li>Lógica de cálculo: hoy, esperado y ejemplo</li><li>Puntaje WSJF, dependencias, anexos, videos y etiquetas</li><li>Especificaciones SDLC: requisitos, funcional, UX/UI, técnica, pruebas, despliegue y monitoreo</li></ul></div>
+      <div class="card"><h2>Fórmula</h2><p style="margin:0 0 8px;font-family:var(--f-mono);font-size:13px">CoD = Valor + Criticidad + Riesgo<br>WSJF = CoD ÷ Tamaño</p><p class="muted" style="margin:0">Cada criterio se puntúa en Fibonacci (1, 2, 3, 5, 8, 13, 20). Negocio estima el CoD; el equipo técnico estima el tamaño.</p></div>
+      <div class="card tbl"><h2>Vías según tamaño</h2><table><thead><tr><th>Vía</th><th>Tamaños</th><th>WSJF</th><th>Hasta Listo</th></tr></thead><tbody>
+        <tr><td><span class="pill p-rapida">Express</span></td><td>Quick Win (1), Minor (2)</td><td>Sesión de reposición semanal</td><td>≤ 3 días</td></tr>
+        <tr><td><span class="pill p-agil">Focus</span></td><td>Moderate (3)</td><td>Sesión 1 CoD · Sesión 2 WSJF</td><td>≤ 1 semana</td></tr>
+        <tr><td><span class="pill p-completa">Strategic</span></td><td>Major (5), Large Scale (8)</td><td>C1 → C4 y kickoff</td><td>2 a 3 semanas</td></tr></tbody></table></div>
+      <div class="card"><h2>Definition of Ready</h2><ul class="clean" id="dorList"></ul></div>
+      <div class="card tbl" style="grid-column:1 / -1"><h2>Escala de puntajes WSJF: cómo elegir cada valor</h2><p class="muted" style="margin:0 0 10px;max-width:90ch">Compara siempre contra otros tickets: el de menor valor del backlog suele llevar 1 y el resto se ubica en relación con él. Si dudas entre dos valores, elige el más bajo y anota la duda en la justificación.</p><div id="scaleGuide"></div></div>
+      <div class="card tbl"><h2>Tipos y cómo entran</h2><table><tbody id="tiposTbl"></tbody></table></div>
+      <div class="card"><h2>Nomenclatura</h2><p style="margin:0 0 8px;font:600 14px var(--f-mono)">TIPO-ÁREA-NNN · Título</p><ul class="clean"><li>Título en infinitivo: verbo + objeto + resultado</li><li>Un requerimiento = un resultado medible</li><li>El código no cambia aunque cambie la prioridad</li><li>En Jira: tipo = Issue Type, área = Componente, producto = etiqueta</li><li>Etiquetas nuevas: se proponen en la ficha y las aprueba el PM</li></ul></div>
+      <div class="card"><h2>MoSCoW para el alcance</h2><ul class="clean"><li><b>Must</b>: sin esto no sirve; forma el MVP (≤ 60% del esfuerzo)</li><li><b>Should</b>: importante, con alternativa temporal</li><li><b>Could</b>: deseable si sobra capacidad</li><li><b>Won't</b>: fuera de esta entrega (va en «no incluye»)</li></ul><p class="muted" style="margin:8px 0 0">WSJF decide qué va primero; MoSCoW decide qué entra en cada entrega.</p></div>
+    </div>
+  </section>
+  <!-- ============ INICIATIVA ============ -->
+  <section class="panel" id="p-init" hidden>
+    <div class="work">
+      <form class="form" id="fi" autocomplete="off">
+        <div class="card">
+          <h2 data-tip="Lienzo de alto nivel para refinar una idea antes de crear tickets. Complétalo con los stakeholders durante el discovery; cuando esté listo, pásalo a la ficha.">Iniciativa <span class="ex" id="initEx">Ejemplo cargado</span></h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Nombre corto orientado al resultado. Ej.: Reducir la mora temprana en 10%.">Nombre de la iniciativa<input id="i_nombre"></label>
+            <label class="f" data-tip="Área que impulsa la iniciativa.">Área principal<select id="i_area"></select></label>
+            <label class="f" data-tip="Sistema principal que se impactará.">Sistema<select id="i_sistema"></select></label>
+            <label class="f wide" data-tip="Otras áreas que participan o se ven afectadas por la iniciativa.">Otras áreas involucradas<input type="hidden" id="i_areasExtra"><div class="chips" id="iAreasPick"></div></label>
+            <label class="f wide" data-tip="Personas o gerencias que patrocinan y deciden. Agrega todas las que correspondan: escribe nombre y área, y pulsa Enter o «Agregar».">Sponsors / stakeholders<input type="hidden" id="i_sponsor"><div class="chips" id="spTags"></div><span class="actions"><input id="spNew" placeholder="Ej.: Gerencia de Riesgos" style="flex:1 1 180px;width:auto"><button type="button" class="btn sm" id="spAdd">Agregar</button></span></label>
+            <label class="f" data-tip="Fecha en la que el negocio espera el resultado, si existe.">Fecha objetivo<input id="i_fecha" type="date"></label>
+          </div>
+        </div>
+        <div class="card">
+          <h2 data-tip="Por qué vale la pena: el problema, el objetivo de negocio y la apuesta que haremos.">Problema, objetivo e hipótesis</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Qué duele hoy, a quién y cuánto. Con datos si los hay.">Problema u oportunidad<textarea id="i_problema" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Objetivo de negocio u OKR al que aporta.">Objetivo / OKR<input id="i_objetivo"></label>
+            <label class="f wide" data-tip="Formato: Creemos que [solución] para [usuarios] lograremos [resultado]. Lo sabremos cuando [KPI].">Hipótesis<textarea id="i_hipotesis" rows="2"></textarea></label>
+            <label class="f" data-tip="Quiénes se benefician o cambian su forma de trabajar.">Usuarios impactados<input id="i_usuarios"></label>
+            <label class="f" data-tip="Indicador principal y su valor actual.">KPI y línea base<input id="i_kpi"></label>
+          </div>
+        </div>
+        <div class="card">
+          <h2 data-tip="Límites de la iniciativa, lo que puede salir mal y lo que necesita de otros.">Alcance, riesgos y dependencias</h2>
+          <div class="grid">
+            <label class="f wide" data-tip="Grandes bloques de lo que se hará, uno por línea.">Alcance de alto nivel<textarea id="i_alcance" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Lo que explícitamente no se hará en esta iniciativa.">Fuera de alcance<textarea id="i_fuera" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Riesgos y supuestos a validar, uno por línea. Indica cómo validarlos.">Riesgos y supuestos<textarea id="i_riesgos" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Equipos, proveedores o decisiones de las que depende.">Dependencias<textarea id="i_deps" rows="2"></textarea></label>
+            <label class="f wide" data-tip="Épicas que saldrían de la iniciativa, una por línea con verbo en infinitivo. La primera se usa como título al pasar a ficha.">Épicas candidatas<textarea id="i_epicas" rows="3"></textarea></label>
+          </div>
+        </div>
+        <div class="card">
+          <h2 data-tip="Puntaje aproximado para comparar iniciativas. Se afina por ticket en las ceremonias.">Puntaje preliminar y decisión</h2>
+          <div class="grid">
+            <label class="f" data-tip="Valor de negocio preliminar (escala Fibonacci).">Valor<select id="i_valor"></select></label>
+            <label class="f" data-tip="Criticidad temporal preliminar.">Criticidad<select id="i_crit"></select></label>
+            <label class="f" data-tip="Riesgo u oportunidad preliminar.">Riesgo / Oportunidad<select id="i_riesgo"></select></label>
+            <label class="f" data-tip="Tamaño aproximado de toda la iniciativa. Suele ser Large Scale: se divide en épicas.">Tamaño<select id="i_talla"></select></label>
+            <label class="f" data-tip="En discovery: seguir conversando. Lista para fichas: crear tickets. En pausa o Descartada: no avanza.">Decisión<select id="i_decision"></select></label>
+          </div>
+        </div>
+      </form>
+      <aside class="out">
+        <div class="card" style="display:grid;gap:10px">
+          <div class="metrics" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+            <div class="metric"><span>Madurez</span><b id="initPct" style="font-size:13px"></b><div class="meter"><div id="initMeter"></div></div></div>
+            <div class="metric"><span>CoD prel.</span><b id="initC">–</b></div>
+            <div class="metric"><span>WSJF prel.</span><b id="initW">–</b></div>
+          </div>
+          <div class="next" id="initNext"></div>
+          <div class="box"><div class="bh">Resumen <button type="button" class="btn sm" id="cpInitSum">Copiar</button></div><div class="sum" id="initSum"></div></div>
+          <div class="box"><div class="bh">Descripción para Jira (Iniciativa) <button type="button" class="btn sm" id="cpInitDesc">Copiar</button></div><pre id="initDesc" tabindex="0"></pre></div>
+          <div class="actions">
+            <button type="button" class="btn primary" id="btnInitSave">Guardar iniciativa</button>
+            <button type="button" class="btn" id="btnInitTicket">Pasar a ficha</button>
+            <button type="button" class="btn" id="btnInitNew">Nueva iniciativa</button>
+          </div>
+        </div>
+        <div class="card" id="aiInit">
+          <h2 data-tip="La IA lee el lienzo de la iniciativa. Usa las consultas sugeridas para refinarla antes de crear tickets.">Refinar con IA</h2>
+          <div class="chips aiBtns"></div>
+          <label class="f" style="margin-top:10px" data-tip="Pregunta libre sobre la iniciativa.">Tu consulta<textarea class="aiQ" id="aiQi" rows="2"></textarea></label>
+          <div class="actions" style="margin-top:8px"><button type="button" class="btn sm aiFree">Consultar</button><button type="button" class="btn sm aiStop" hidden>Detener</button></div>
+          <div class="box" style="margin-top:10px"><div class="bh">Respuesta <span class="actions"><button type="button" class="btn sm aiUse" hidden>Agregar al lienzo</button><button type="button" class="btn sm aiCopy">Copiar</button><button type="button" class="btn sm aiCopyPrompt" hidden>Copiar prompt</button></span></div><pre class="aiOut" tabindex="0">Elige una consulta sugerida para empezar.</pre></div>
+        </div>
+        <div class="card"><h2>Mis iniciativas</h2><div id="initList" style="display:grid;gap:8px"></div></div>
+      </aside>
+    </div>
+  </section>
+  <!-- ============ NOTAS ============ -->
+  <section class="panel" id="p-notas" hidden>
+    <div class="work" style="grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr)">
+      <div class="card" style="display:grid;gap:10px;align-content:start">
+        <h2 data-tip="Tu bloc de notas personal: apuntes de ceremonias, ideas, pendientes. Se guarda solo mientras escribes.">Bloc de notas</h2>
+        <div class="actions"><input id="noteQ" type="search" placeholder="Buscar en notas" aria-label="Buscar en notas" style="flex:1 1 140px;width:auto"><button type="button" class="btn sm primary" id="noteNew">Nueva nota</button></div>
+        <button type="button" class="btn sm ghost" id="noteFromTicket">Nota para el ticket de la ficha</button>
+        <div id="noteList" class="nlist"></div>
+      </div>
+      <div class="card" style="display:grid;gap:10px;align-content:start">
+        <p id="noteEmpty" class="empty" style="margin:0">Elige una nota de la lista o crea una nueva.</p>
+        <div id="noteEditor" hidden style="display:grid;gap:10px">
+          <label class="f" data-tip="Título corto para encontrar la nota después.">Título<input id="noteTitle"></label>
+          <label class="f" data-tip="Escribe libremente. Se guarda solo al dejar de escribir.">Nota<textarea id="noteBody" rows="16" style="min-height:320px;font-family:var(--f-mono);font-size:13px"></textarea></label>
+          <div class="toolbar"><span class="sub" id="noteState" style="margin:0">Guardado</span><div class="actions"><button type="button" class="btn sm" id="noteCopy">Copiar</button><span id="noteDelWrap"></span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2 data-tip="Dónde se guardan tus datos y cómo moverlos. El respaldo JSON sirve para pasar tu información a la versión con Supabase o para tener una copia.">Datos, respaldo y Supabase</h2>
+      <p class="sub" id="storeInfo" style="margin:0 0 10px"></p>
+      <div class="actions"><button type="button" class="btn sm" id="bkExport">Descargar respaldo JSON</button><label class="btn sm" for="bkFile" style="display:inline-flex;align-items:center">Importar respaldo JSON</label><input type="file" id="bkFile" accept="application/json,.json" hidden></div>
+      <p class="sub" style="margin:10px 0 0">Para guardar en Supabase con historial completo e inicio de sesión por correo y PIN, publica este mismo archivo en tu propio hosting y ejecuta el script SQL entregado. Al abrirlo fuera de Claude te pedirá la URL y la clave pública de tu proyecto.</p>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+<div class="login" id="login" hidden>
+  <div class="card lgcard">
+    <small style="display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600">Empresa · Estudio de Requerimientos WSJF</small>
+    <h2 style="font-size:20px;margin:6px 0 4px">Entrar al Estudio</h2>
+    <div id="lgChoice" hidden style="display:grid;gap:8px">
+      <p class="sub" style="margin:0 0 4px">¿Cómo quieres trabajar hoy?</p>
+      <button class="btn primary" type="button" id="lgSaveClaude">Entrar y guardar en mi cuenta</button>
+      <p class="sub" style="margin:0 0 6px">Tus tickets, iniciativas, notas y actas quedan guardados, con historial de versiones.</p>
+      <button class="btn" type="button" id="lgTempClaude">Entrar sin guardar</button>
+      <p class="sub" style="margin:0">Usas todo normalmente; los datos se pierden al cerrar. Puedes pasar a guardar después y se conserva lo que hiciste.</p>
+    </div>
+    <form id="lgCfg" hidden style="display:grid;gap:10px">
+      <p class="sub" style="margin:0">Conecta tu proyecto de Supabase (una sola vez en este navegador).</p>
+      <label class="f">URL del proyecto<input id="sbUrl" type="url" placeholder="https://xxxx.supabase.co" required></label>
+      <label class="f">Clave pública (anon key)<input id="sbKey" required></label>
+      <button class="btn primary" type="submit">Guardar y continuar</button>
+      <button class="btn" type="button" id="lgLocal">Entrar sin guardar</button>
+      <p class="sub" style="margin:0">Usas todo normalmente, pero los datos se pierden al cerrar la página.</p>
+    </form>
+    <form id="lgMail" hidden style="display:grid;gap:10px">
+      <p class="sub" style="margin:0">Escribe tu correo de PM. Te enviaremos un código PIN de 6 dígitos a tu Gmail.</p>
+      <label class="f">Correo<input id="lgEmail" type="email" autocomplete="email" required></label>
+      <button class="btn primary" type="submit">Enviar código PIN</button>
+      <button class="btn" type="button" id="lgSkip">Entrar sin guardar</button>
+      <p class="sub" style="margin:0">Sin iniciar sesión: los datos viven solo mientras la página está abierta. Puedes iniciar sesión después y se guardará lo que hayas hecho.</p>
+      <button class="btn sm" type="button" id="lgReset">Cambiar proyecto de Supabase</button>
+    </form>
+    <form id="lgCode" hidden style="display:grid;gap:10px">
+      <p class="sub" style="margin:0">Revisa tu correo (también la carpeta de spam) e ingresa el código.</p>
+      <label class="f">Código PIN<input id="lgPin" inputmode="numeric" autocomplete="one-time-code" maxlength="8" required style="font:600 20px var(--f-mono);letter-spacing:.3em"></label>
+      <button class="btn primary" type="submit">Entrar</button>
+      <button class="btn sm" type="button" id="lgBack">Usar otro correo o reenviar código</button>
+    </form>
+    <p class="sub" id="lgMsg" role="status" style="margin:8px 0 0;color:var(--crit)"></p>
+  </div>
+</div>
+
+
+<script>
+const PD = 'Por definir';
+const TIPOS = [
+  ['HU','Historia','Evolución','Se prioriza con WSJF'],['MEJ','Mejora','Evolución','Se prioriza con WSJF'],['REG','Regulatorio','Evolución','WSJF o Fecha fija'],
+  ['DEF','Defecto','Calidad','Se corrige dentro de la historia'],['INS','Incidencia de software','Calidad','Se atiende por severidad'],
+  ['INN','Incidencia de negocio','Operación','Se atiende por SLA'],['SOP','Soporte','Operación','Se atiende por SLA'],
+  ['DT','Deuda técnica','Técnico','Cupo fijo del WIP'],['SPK','Spike','Técnico','Cupo fijo del WIP']];
+const AREAS = [['COM','Comercial'],['OPE','Operaciones'],['COB','Cobranzas'],['RIE','Riesgos'],['CUM','Cumplimiento'],['LEG','Legal'],['INV','Inversionistas'],['FIN','Finanzas'],['TES','Tesorería'],['CON','Contabilidad'],['ATC','Atención al cliente'],['MKT','Marketing'],['PRO','Producto'],['DAT','Datos y BI'],['RRH','Talento humano'],['TEC','Tecnología']];
+const SISTEMAS = ['Factoring Admin', 'Public', 'Ambos (Factoring Admin y Public)', 'Transversal (varios sistemas)', 'Otro'];
+const URGENCIAS = ['Crítica', 'Alta', 'Media', 'Baja'];
+const FIB = [1,2,3,5,8,13,20];
+const TALLAS = [['Quick Win',1,'Hasta 2 días'],['Minor',2,'Hasta 1 semana'],['Moderate',3,'1 a 2 semanas'],['Major',5,'2 a 4 semanas'],['Large Scale',8,'Más de 1 mes']];
+const CLASES = ['Estándar','Fecha fija','Urgente','Intangible'];
+const ESTADOS = ['Entrada','Refinamiento','Priorizado','Listo','En desarrollo','Validación','Hecho','En espera'];
+const ANEXO_T = ['Excel / simulación','Fórmula','Documento','Imagen','Otro'];
+const CEREMONIAS = ['C1 · Presentación de la necesidad','C2 · Revisión funcional','C3 · Refinamiento técnico','C4 · Validación y priorización','Kickoff','Sesión de reposición','Sesión 1 (Focus)','Sesión 2 (Focus)'];
+const NF_CHIPS = ['Rendimiento: respuesta < 3 s', 'Seguridad: acceso por rol', 'Auditoría: registrar quién y cuándo', 'Disponibilidad en horario operativo', 'Reintentos ante fallo de proveedor', 'Compatibilidad con navegadores actuales', 'Datos sensibles enmascarados'];
+const RUBRIC = {
+  valor: { n: 'Valor de negocio', q: '¿Cuánto valor genera para clientes, inversionistas o la operación?', s: [
+    [1, 'Mínimo', 'Mejora cosmética o pedido de una persona, sin impacto medible.', 'Cambiar un texto interno o un color en Factoring Admin.'],
+    [2, 'Muy bajo', 'Facilita la tarea de pocas personas internas.', 'Un atajo o filtro extra en una pantalla de Admin.'],
+    [3, 'Bajo', 'Ahorra tiempo a un equipo o mejora la experiencia de un grupo pequeño de clientes.', 'Exportar un reporte que hoy se arma a mano.'],
+    [5, 'Medio', 'Impacto visible en un proceso o en el KPI de un área.', 'Alertas de vencimiento que reducen la mora de Cobranzas.'],
+    [8, 'Alto', 'Impacto en ingresos, conversión o costos de varias áreas.', 'Simplificar el onboarding de inversionistas.'],
+    [13, 'Muy alto', 'Impacto directo en ingresos o en la mayoría de clientes; ventaja competitiva.', 'Validación automática que acelera todas las operaciones de factoring.'],
+    [20, 'Crítico', 'Sin esto el negocio no opera o no puede lanzar una línea de producto.', 'Requisito indispensable para lanzar un producto nuevo.']] },
+  crit: { n: 'Criticidad temporal', q: '¿Qué perdemos si se hace en 3 meses en lugar de ahora?', s: [
+    [1, 'Ninguna', 'Da igual hacerlo hoy o en 6 meses.', 'Mejora de un reporte histórico.'],
+    [2, 'Muy baja', 'Conviene hacerlo este año, sin fecha.', 'Ordenar opciones de un menú.'],
+    [3, 'Baja', 'El valor cae poco si se posterga un trimestre.', 'Onboarding de inversionistas sin campaña asociada.'],
+    [5, 'Media', 'Hay una fecha deseable (cierre, temporada) o el problema crece mes a mes.', 'La mora sube cada cierre de mes.'],
+    [8, 'Alta', 'El valor cae rápido: campaña, competencia o compromiso en semanas.', 'Texto legal que debe estar antes de una campaña.'],
+    [13, 'Muy alta', 'Plazo regulatorio o contractual cercano; multa o pérdida si se atrasa.', 'Reporte PLAFT con fecha del regulador.'],
+    [20, 'Inmediata', 'El daño ya ocurre cada día: pérdida diaria o bloqueo operativo.', 'Un flujo de desembolso detenido.']] },
+  riesgo: { n: 'Riesgo / Oportunidad', q: '¿Qué riesgo reduce o qué otro trabajo habilita?', s: [
+    [1, 'Ninguno', 'No reduce riesgos ni habilita otro trabajo.', 'Cambio estético aislado.'],
+    [2, 'Muy bajo', 'Reduce un riesgo menor y ocasional.', 'Evitar un error de digitación poco frecuente.'],
+    [3, 'Bajo', 'Reduce errores manuales poco frecuentes o mejora la calidad de un dato.', 'Validar el formato de un campo.'],
+    [5, 'Medio', 'Reduce un riesgo operativo recurrente o habilita una mejora futura.', 'Registrar los envíos para poder auditarlos.'],
+    [8, 'Alto', 'Reduce riesgo de fraude, seguridad o error financiero, o desbloquea otro proyecto.', 'OCR que detecta facturas o DNI alterados.'],
+    [13, 'Muy alto', 'Evita un incumplimiento regulatorio o habilita una iniciativa estratégica.', 'Trazabilidad exigida por cumplimiento.'],
+    [20, 'Crítico', 'Evita una sanción grave, la pérdida de una licencia o una falla mayor.', 'Corregir un hueco de seguridad expuesto.']] },
+};
+const rubOf = (k, v) => (RUBRIC[k].s.find(x => x[0] === +v) || null);
+function rubTable(k) { const R = RUBRIC[k]; return '<table class="rubt"><thead><tr><th>Valor</th><th>Nivel</th><th>Cuándo elegirlo</th><th>Ejemplo</th></tr></thead><tbody>' + R.s.map(([v, l, d, e]) => '<tr><td>' + v + '</td><td class="lvl">' + l + '</td><td>' + esc(d) + '</td><td class="muted">' + esc(e) + '</td></tr>').join('') + '</tbody></table>'; }
+const NEXT = {
+  '': 'Triaje: el Tech Lead da la talla preliminar en 24 h para definir la vía.',
+  'Express': 'Llevar a la <b>sesión de reposición semanal</b> (PM, PO y Tech Lead): se confirma el CoD, se calcula el WSJF y, si hay cupo, pasa a «Listo».',
+  'Focus': '<b>Sesión 1</b>: revisión funcional y CoD con el área. <b>Sesión 2</b>: Planning Poker y WSJF con el Tech Lead y los devs.',
+  'Strategic': '<b>C1</b> necesidad · <b>C2</b> revisión funcional · <b>C3</b> refinamiento técnico · <b>C4</b> WSJF y priorización · <b>Kickoff</b>.'};
+const EXAMPLE = { tipo:'HU', area:'COB', corr:'004', titulo:'Enviar alertas de vencimiento para reducir la mora temprana', sistema:'Ambos (Factoring Admin y Public)', sistemaOtro:'', producto:'FAC', estado:'Refinamiento',
+  pm:'Product Manager', po:'Nombre del PO', tl:'Nombre del Tech Lead', contacto:'Jefatura de Cobranzas',
+  objetivo:'Que los clientes paguen a tiempo gracias a un recordatorio automático antes del vencimiento, sin depender de llamadas manuales.',
+  problema:'Los clientes olvidan sus fechas de pago y la mora a 30 días sube cada cierre de mes. Hoy Cobranzas llama uno por uno.', kpi:'−10% de mora a 30 días en 3 meses',
+  urgencia:'Alta', clase:'Estándar', fecha:'',
+  como:'cliente con una operación activa', quiero:'recibir un recordatorio por correo y SMS 3 días antes del vencimiento', para:'pagar a tiempo y evitar intereses moratorios',
+  incluye:'Recordatorio por correo y SMS\nConfiguración de días de anticipación en Factoring Admin\nRegistro de envíos', noIncluye:'Recordatorios por WhatsApp\nAvisos posteriores al vencimiento',
+  modulos:'Cobranzas, Notificaciones', vistas:'Factoring Admin > Cobranzas > Calendario de vencimientos\nFactoring Admin > Configuración > Notificaciones\nPublic > Mi cuenta > Notificaciones',
+  reglas:'El recordatorio se envía 3 días calendario antes del vencimiento, a las 9:00\nNo se envía si la cuota está pagada o reprogramada\nMáximo un recordatorio por cuota y por canal',
+  criterios:'Escenario: Recordatorio a cuota por vencer\n  Dado una cuota que vence en 3 días\n  Y el cliente tiene correo y celular registrados\n  Cuando corre el proceso diario de recordatorios\n  Entonces el cliente recibe un correo y un SMS\n\nEscenario: Cliente que ya pagó\n  Dado una cuota que vence en 3 días\n  Y el cliente ya registró el pago\n  Cuando corre el proceso diario de recordatorios\n  Entonces no se envía recordatorio\n\nEscenario: Envío fallido\n  Dado una cuota que vence en 3 días\n  Cuando el proveedor de SMS responde error\n  Entonces el envío queda registrado para reintento\n  Y se notifica en el log de auditoría',
+  figma:'', prototipo:'',
+  nfNeg:'Mensaje con tono cercano y sin mostrar el número de cuenta completo\nEnvío en horario de 9:00 a 18:00',
+  nfTl:'Proceso batch menor a 10 min para 50 mil cuotas\nReintentos ante fallo del proveedor de SMS\nRegistro de auditoría de cada envío',
+  calcHoy:'Cobranzas descarga un reporte diario de cuotas por vencer y llama manualmente a cada cliente.',
+  calcNuevo:'fecha_envio = fecha_vencimiento − N días (N = 3, configurable)\nenviar si estado_cuota = «Pendiente» y no existe envío previo para la cuota y el canal',
+  calcEj:'Cuota vence el 20/11 → envío el 17/11 a las 9:00. Si el cliente pagó el 16/11, no se envía.',
+  anexos:[{ tipo:'Excel / simulación', nombre:'Simulación de envíos de noviembre', url:'' }],
+  deps:'Servicio de notificaciones existente\nContrato vigente con el proveedor de SMS',
+  videos:[{ ceremonia:'C1 · Presentación de la necesidad', fecha:'2026-10-14', url:'' }],
+  tagsExtra:'cobranza', tagsNew:[{ tag:'notificaciones', motivo:'Agrupar los tickets del motor de notificaciones' }],
+  valor:5, crit:5, riesgo:5, talla:'Minor', areasExtra:'RIE',
+  sdlc:{ req:{ estado:'Listo', resp:'Product Manager' }, func:{ estado:'En curso', resp:'Product Owner' }, ux:{ estado:'En curso', resp:'Diseñador' }, tec:{ estado:'Pendiente', resp:'Tech Lead' }, qa:{ estado:'Pendiente', resp:'Validación' }, dep:{ estado:'Pendiente', resp:'Tech Lead' }, ops:{ estado:'Pendiente', resp:'Product Manager' } },
+  disc:{ q1:{ ok:true, ans:'Clientes con cuotas por vencer; la mora a 30 días sube cada cierre' }, q4:{ ok:true, ans:'Mora a 30 días: 6.2% hoy; meta 5.6%' }, q8:{ ok:true, ans:'Factoring Admin (configuración) y Public (notificaciones)' } }, discCustom:[], design:{ d2:true, d5:false } };
+const SIM_EJ = [
+  { codigo:'REG-CUM-001', titulo:'Reporte PLAFT automático completo', tipo:'REG', valor:13, crit:13, riesgo:13, talla:'Large Scale' },
+  { codigo:'REG-CUM-001a', titulo:'MVP del reporte PLAFT (factoring)', tipo:'REG', valor:13, crit:13, riesgo:13, talla:'Moderate' },
+  { codigo:'HU-OPE-002', titulo:'OCR de facturas y DNI', tipo:'HU', valor:13, crit:5, riesgo:8, talla:'Major' },
+  { codigo:'MEJ-INV-003', titulo:'Onboarding de inversionistas', tipo:'MEJ', valor:8, crit:3, riesgo:3, talla:'Moderate' },
+  { codigo:'HU-COB-004', titulo:'Alertas de vencimiento', tipo:'HU', valor:5, crit:5, riesgo:5, talla:'Minor' },
+  { codigo:'MEJ-CUM-006', titulo:'Texto legal del simulador', tipo:'MEJ', valor:3, crit:8, riesgo:5, talla:'Quick Win' },
+  { codigo:'HU-COM-005', titulo:'Dashboard comercial', tipo:'HU', valor:5, crit:2, riesgo:2, talla:'Major' }];
+const RACI = [
+  ['Registrar la necesidad y crear el ticket (Informador)', ['C','A/R','I','I','–','–']],
+  ['Puntuar el CoD (valor, criticidad, riesgo)', ['R','A','C','C','–','I']],
+  ['Talla preliminar y elección de vía (triaje)', ['–','I','I','A/R','C','–']],
+  ['Historia, alcance, reglas y criterios funcionales', ['C','C','A/R','C','I','–']],
+  ['Criterios no funcionales', ['C','I','C','A/R','C','–']],
+  ['Planning Poker (tamaño)', ['–','I','C','A','R','–']],
+  ['Calcular WSJF y priorizar (C4 o sesión)', ['C','A','R','C','I','I']],
+  ['Kickoff y desarrollo', ['I','I','C','A','R','I']],
+  ['Validar la entrega y medir el KPI', ['C','A','R','C','C','I']]];
+const SDLC = [
+  ['req', 'Requisitos de negocio', 'Ficha / BRD: objetivo, problema, KPI y alcance', 'Product Manager'],
+  ['func', 'Especificación funcional', 'Historia, reglas de negocio, criterios y flujos', 'Product Owner'],
+  ['ux', 'Diseño UX/UI', 'Figma y prototipo (si requiere diseñador)', 'Diseñador'],
+  ['tec', 'Especificación técnica', 'Arquitectura, APIs, modelo de datos, integraciones', 'Tech Lead'],
+  ['qa', 'Plan y casos de prueba', 'Escenarios, datos de prueba, criterios de salida', 'Validación'],
+  ['dep', 'Plan de despliegue y rollback', 'Pasos de salida, ventana, reversión, comunicación', 'Tech Lead'],
+  ['ops', 'Monitoreo y medición', 'Alertas, logs y medición del KPI después de salir', 'Product Manager']];
+const SD_EST = ['Pendiente', 'En curso', 'Listo', 'No aplica'];
+const RACI_ROLES = ['Área solicitante','Product Manager','Product Owner','Tech Lead','Devs y Validación','Stakeholders'];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const lines = (s) => String(s || '').split('\n').map(x => x.trim()).filter(Boolean);
+const tipoInfo = (c) => TIPOS.find(t => t[0] === c) || ['', PD, 'Por definir', 'Define el tipo para saber cómo entra al flujo'];
+const areaName = (c) => (AREAS.find(a => a[0] === c) || ['', PD])[1];
+const tallaVal = (n) => (TALLAS.find(t => t[0] === n) || [])[1] || null;
+const viaOf = (n) => !n ? '' : (n === 'Quick Win' || n === 'Minor') ? 'Express' : n === 'Moderate' ? 'Focus' : 'Strategic';
+const viaCls = (v) => ({ 'Express':'p-rapida','Focus':'p-agil','Strategic':'p-completa' }[v] || 'p-none');
+const sistemaOf = (t) => t.sistema === 'Otro' ? (t.sistemaOtro || 'Otro (por definir)') : (t.sistema || PD);
+const fmtDate = (d) => d ? d.split('-').reverse().join('/') : '';
+let UMBRAL = 10;
+try { const u = parseInt(localStorage.getItem('wsjf-umbral')); if (u) UMBRAL = u; } catch (e) {}
+
+function compute(t) {
+  const cod = [t.valor, t.crit, t.riesgo].every(v => +v > 0) ? (+t.valor + +t.crit + +t.riesgo) : null;
+  const tv = tallaVal(t.talla);
+  const wsjf = cod && tv ? Math.round(cod / tv * 10) / 10 : null;
+  const via = viaOf(t.talla);
+  const grupo = tipoInfo(t.tipo)[2];
+  const dor = [['Objetivo definido', !!(t.objetivo || '').trim()], ['Resultado esperado medible', !!(t.kpi || '').trim()], ['Sistema y módulos definidos', !!t.sistema && !!(t.modulos || '').trim()],
+    ['Alcance definido', lines(t.incluye).length > 0], ['Reglas de negocio y criterios en Gherkin', lines(t.reglas).length > 0 && !!gherkinCheck(t) && !gherkinCheck(t).bad.length], ['WSJF calculado', wsjf != null], ['Tamaño hasta Major', !!t.talla && t.talla !== 'Large Scale'], ['Diseño resuelto (Figma si se requiere)', !((designScore(t) ?? 0) >= 3) || !!t.figma]];
+  const pend = [['Tipo', t.tipo], ['Área', t.area], ['Sistema', t.sistema], ['Urgencia', t.urgencia], ['Valor', t.valor], ['Criticidad', t.crit], ['Riesgo', t.riesgo], ['Tamaño', t.talla]].filter(x => !x[1]).map(x => x[0]);
+  const alerts = [];
+  if (pend.length) alerts.push(['info', 'Por definir:', pend.join(', ') + '.']);
+  if (!t.tipo || !t.area) alerts.push(['warn', 'Código provisional:', 'define tipo y área antes de crear el ticket en Jira.']);
+  if (t.tipo && grupo !== 'Evolución') alerts.push(['info', tipoInfo(t.tipo)[1] + ':', tipoInfo(t.tipo)[3].toLowerCase() + '. No compite en el ranking WSJF.']);
+  if (cod != null && cod < UMBRAL) alerts.push(['warn', 'En espera:', 'CoD ' + cod + ' es menor al umbral (' + UMBRAL + '). Se revisa en el comité mensual.']);
+  if (t.talla === 'Large Scale') alerts.push(['crit', 'Dividir:', 'un Large Scale no entra a «Listo». Usa MoSCoW para definir el MVP y vuelve a la revisión funcional.']);
+  if (t.clase === 'Fecha fija' && !t.fecha) alerts.push(['warn', 'Fecha fija:', 'registra la fecha límite y su motivo.']);
+  if (t.clase === 'Urgente' || t.urgencia === 'Crítica') alerts.push(['crit', 'Urgente:', 'confirma la clase de servicio con el PM; máximo 1 urgente a la vez en el tablero.']);
+  const gk = gherkinCheck(t); if (gk && gk.bad.length) alerts.push(['warn', 'Gherkin:', gk.bad.length + ' escenario(s) sin Dado, Cuando y Entonces: ' + gk.bad.map(x => '«' + x.name + '»').join(', ') + '.']);
+  const words = (t.titulo || '').trim().split(/\s+/).filter(Boolean).length;
+  if (words > 10) alerts.push(['warn', 'Título:', words + ' palabras; procura máximo 10.']);
+  if (!alerts.length && dor.every(d => d[1])) alerts.push(['ok', 'Listo:', 'cumple la Definition of Ready.']);
+  return { cod, tv, wsjf, via, grupo, dor, alerts };
+}
+/* ---------- Gherkin ---------- */
+const GHK_KW = /^(Característica|Antecedentes|Escenario|Esquema del escenario|Ejemplos|Dado|Dada|Dados|Dadas|Cuando|Entonces|Y|E|Pero)\b\s*:?/i;
+function gherkinScenarios(text) {
+  const out = []; let curS = null; const ls = String(text || '').split('\n').map(x => x.trim()).filter(Boolean);
+  for (const ln of ls) {
+    if (/^(Característica)\s*:/i.test(ln)) continue;
+    const mS = ln.match(/^(Escenario|Esquema del escenario|Antecedentes)\s*:\s*(.*)$/i);
+    if (mS) { curS = { kw: mS[1][0].toUpperCase() + mS[1].slice(1).toLowerCase(), name: mS[2], steps: [] }; out.push(curS); continue; }
+    if (GHK_KW.test(ln) && !/,\s*cuando\b/i.test(ln)) { if (!curS) { curS = { kw: 'Escenario', name: '', steps: [] }; out.push(curS); } const k = ln.match(GHK_KW)[1]; curS.steps.push([k[0].toUpperCase() + k.slice(1).toLowerCase(), ln.replace(GHK_KW, '').trim()]); continue; }
+    // una línea «Dado…, cuando…, entonces…»
+    const parts = ln.replace(/\.$/, '').split(/,?\s+(?=(?:cuando|entonces|y|pero)\s)/i);
+    const steps = parts.map((p, i) => { const m = p.match(/^(dado que|dada|dado|dados|dadas|cuando|entonces|y|pero)\s+(.*)$/i); if (!m) return [i === 0 ? 'Dado' : 'Y', p]; let k = m[1].toLowerCase(); if (k === 'dado que') return ['Dado', 'que ' + m[2]]; return [k[0].toUpperCase() + k.slice(1), m[2]]; });
+    const th = steps.find(x => x[0] === 'Entonces');
+    curS = { kw: 'Escenario', name: th ? th[1] : '', steps }; out.push(curS); curS = null;
+  }
+  out.forEach((sc, i) => { if (!sc.name && sc.kw === 'Escenario') sc.name = 'Criterio ' + (i + 1); sc.name = sc.name.charAt(0).toUpperCase() + sc.name.slice(1); });
+  return out;
+}
+function toGherkin(t) {
+  const sc = gherkinScenarios(t.criterios); if (!sc.length) return '';
+  const L = ['# language: es', 'Característica: ' + (t.titulo || 'Sin título')];
+  if (t.como || t.quiero || t.para) L.push('  Como ' + (t.como || PD), '  Quiero ' + (t.quiero || PD), '  Para ' + (t.para || PD));
+  for (const s of sc) { L.push('', '  ' + s.kw + ': ' + s.name); for (const [k, v] of s.steps) L.push('    ' + k + ' ' + v); }
+  return L.join('\n');
+}
+function gherkinCheck(t) {
+  const sc = gherkinScenarios(t.criterios); if (!sc.length) return null;
+  const bad = sc.filter(s => s.kw === 'Escenario' && !(s.steps.some(x => /^Dad/.test(x[0])) && s.steps.some(x => x[0] === 'Cuando') && s.steps.some(x => x[0] === 'Entonces')));
+  return { n: sc.length, bad };
+}
+const codeOf = (t) => (t.tipo || 'TIPO') + '-' + (t.area || 'XXX') + '-' + String(t.corr || '').padStart(3, '0');
+function rankOf(t) {
+  const c = compute(t); if (c.wsjf == null || c.grupo !== 'Evolución') return null;
+  const others = tickets.filter(x => x.id !== editingId && tipoInfo(x.tipo)[2] === 'Evolución').map(x => compute(x).wsjf).filter(v => v != null);
+  return { pos: others.filter(v => v > c.wsjf).length + 1, total: others.length + 1 };
+}
+
+/* ---------- documento estructurado → formatos ---------- */
+function docBlocks(t) {
+  const c = compute(t), ti = tipoInfo(t.tipo), rk = rankOf(t), B = [];
+  const val = (v) => (v === '' || v == null) ? PD : v;
+  B.push({ kv: [['Código', codeOf(t)], ['Título', t.titulo || PD]] });
+  if (t.versionLabel) B.push({ para: 'Versión: ' + t.versionLabel + ' · ' + new Date(t.versionAt || t.updatedAt || Date.now()).toLocaleDateString('es-PE') + (t.versionNote ? ' — ' + t.versionNote : '') });
+  B.push({ h: 'Objetivo' }); B.push({ para: t.objetivo || PD });
+  B.push({ h: 'Contexto' });
+  B.push({ kv: [['Tipo', t.tipo ? ti[1] + ' (' + ti[0] + ')' : PD], ['Sistema', sistemaOf(t)], ['Área principal', t.area ? areaName(t.area) + ' (' + t.area + ')' + (t.contacto ? ' · ' + t.contacto : '') : PD], ['Otras áreas involucradas', extrasOf(t).length ? extrasOf(t).map(c => areaName(c) + ' (' + c + ')').join(', ') : '—'], ['Producto / squad', val(t.producto)],
+    ['Informador', t.pm || 'Product Manager'], ['Responsables', 'PO: ' + (t.po || PD) + ' · Tech Lead: ' + (t.tl || PD)], ['Nivel de urgencia', val(t.urgencia)], ['Clase de servicio', val(t.clase)], ['Fecha límite', fmtDate(t.fecha) || '—'], ['Estado', val(t.estado)]] });
+  B.push({ kv: [['Problema u oportunidad', val(t.problema)], ['Resultado esperado (KPI)', val(t.kpi)]] });
+  B.push({ h: 'Historia de usuario' }); B.push({ story: [t.como || PD, t.quiero || PD, t.para || PD] });
+  B.push({ h: 'Alcance' }); B.push({ sub: 'Incluye' }); B.push({ list: lines(t.incluye).length ? lines(t.incluye) : [PD] }); B.push({ sub: 'No incluye' }); B.push({ list: lines(t.noIncluye).length ? lines(t.noIncluye) : [PD] });
+  B.push({ h: 'Módulos y vistas' }); B.push({ kv: [['Módulos afectados', val(t.modulos)]] }); B.push({ sub: 'Vistas principales' }); B.push({ list: lines(t.vistas).length ? lines(t.vistas) : [PD] });
+  B.push({ h: 'Reglas de negocio' }); B.push({ list: lines(t.reglas).length ? lines(t.reglas).map((r, i) => 'RN-' + String(i + 1).padStart(2, '0') + ': ' + r) : [PD] });
+  B.push({ h: 'Criterios funcionales (Gherkin)' }); B.push(lines(t.criterios).length ? { code: toGherkin(t), lang: 'gherkin' } : { para: PD });
+  const links = []; if (t.figma) links.push(['Diseño en Figma', t.figma]); if (t.prototipo) links.push(['Prototipo', t.prototipo]);
+  B.push(links.length ? { links, lead: 'Detalle de interfaz:' } : { para: 'Detalle de interfaz: sin Figma ni prototipo por ahora.' });
+  B.push({ h: 'Criterios no funcionales' }); B.push({ sub: 'Sugeridos por negocio' }); B.push({ list: lines(t.nfNeg).length ? lines(t.nfNeg) : [PD] }); B.push({ sub: 'Mencionados por el Tech Lead' }); B.push({ list: lines(t.nfTl).length ? lines(t.nfTl) : [PD] });
+  if (t.calcHoy || t.calcNuevo || t.calcEj) { B.push({ h: 'Lógica de cálculo' }); if (t.calcHoy) { B.push({ sub: 'Cómo funciona hoy' }); B.push({ code: t.calcHoy }); } if (t.calcNuevo) { B.push({ sub: 'Cómo debe funcionar' }); B.push({ code: t.calcNuevo }); } if (t.calcEj) { B.push({ sub: 'Ejemplo' }); B.push({ code: t.calcEj }); } }
+  B.push({ h: 'Puntaje del ticket (WSJF)' });
+  B.push({ table: { head: ['Valor de negocio', 'Criticidad temporal', 'Riesgo / Oportunidad', 'CoD', 'Tamaño', 'WSJF'], row: [val(t.valor), val(t.crit), val(t.riesgo), c.cod ?? PD, t.talla ? t.talla + ' (' + c.tv + ')' : PD, c.wsjf ?? PD] } });
+  B.push({ sub: 'Por qué estos puntajes' });
+  B.push({ list: ['valor', 'crit', 'riesgo'].map(k => { const r = rubOf(k, t[k]); return RUBRIC[k].n + ': ' + (r ? r[0] + ' (' + r[1] + ') — ' + r[2] : PD); }).concat(t.talla ? ['Tamaño: ' + t.talla + ' (' + c.tv + ') — ' + (TALLAS.find(x => x[0] === t.talla) || [])[2]] : []).concat(t.justif ? ['Justificación: ' + t.justif] : []) });
+  B.push({ kv: [['Vía', c.via || 'Pendiente de triaje'], ['Posición en el backlog', rk ? rk.pos + ' de ' + rk.total : '—'], ['Siguiente paso', NEXT[c.via].replace(/<[^>]+>/g, '')]] });
+  const sdv = t.sdlc || {};
+  B.push({ h: 'Especificaciones SDLC' });
+  B.push({ table: { head: ['Fase', 'Entregable', 'Estado', 'Responsable', 'Enlace'], rows: SDLC.map(([id, n, d, r]) => { const v = sdv[id] || {}; return [n, d, v.estado || 'Pendiente', v.resp || r, v.link || '—']; }) } });
+  const ds = designScore(t), dv = designVerdict(ds), dd = t.disc || {}, allQ = discQuestions(t);
+  const asked = allQ.filter(x => (dd[x.id] || {}).ok || (dd[x.id] || {}).ans), pendQ = allQ.filter(x => !asked.includes(x));
+  B.push({ h: 'Discovery y delivery' });
+  B.push({ kv: [['Diseño (Figma)', dv[1] + (ds != null ? ' (' + ds + ' pts)' : '') + ' — ' + dv[2]], ['Preguntas a stakeholders', asked.length + ' de ' + allQ.length + ' realizadas']] });
+  const dcrit = DESIGN_CRIT.filter(c => (t.design || {})[c[0]]);
+  if (dcrit.length) { B.push({ sub: 'Criterios de diseño que aplican' }); B.push({ list: dcrit.map(c => c[1] + ' (' + (c[2] > 0 ? '+' : '') + c[2] + ')') }); }
+  for (const cer of Object.keys(CER_NAME)) { const qs = asked.filter(x => x.cer === cer); if (!qs.length) continue;
+    B.push({ sub: (qs[0].fase || '') + ' · ' + CER_NAME[cer] }); B.push({ list: qs.map(x => x.q + (x.custom ? ' (pregunta propia)' : '') + ' → ' + ((dd[x.id] || {}).ans || 'preguntada, sin respuesta registrada')) }); }
+  if (pendQ.length) { const byC = Object.keys(CER_NAME).map(c => [c, pendQ.filter(x => x.cer === c).length]).filter(x => x[1]); B.push({ para: 'Preguntas pendientes por ceremonia: ' + byC.map(x => x[0] + ' (' + x[1] + ')').join(', ') + '.' }); }
+  B.push({ h: 'Definition of Ready' }); B.push({ checks: c.dor });
+  B.push({ h: 'Dependencias' }); B.push({ list: lines(t.deps).length ? lines(t.deps) : ['Sin dependencias identificadas'] });
+  const anx = (t.anexos || []).filter(a => a.nombre || a.url);
+  if (anx.length) { B.push({ h: 'Anexos' }); B.push({ links: anx.map(a => ['[' + (a.tipo || 'Anexo') + '] ' + (a.nombre || 'Sin nombre'), a.url]) }); }
+  const vid = (t.videos || []).filter(v => v.url || v.ceremonia);
+  if (vid.length) { B.push({ h: 'Videos de las ceremonias' }); B.push({ links: vid.map(v => [(v.ceremonia || 'Ceremonia') + (v.fecha ? ' · ' + fmtDate(v.fecha) : ''), v.url]) }); }
+  const tn = (t.tagsNew || []).filter(x => x.tag);
+  if (tn.length) { B.push({ h: 'Etiquetas propuestas (pendientes de aprobación)' }); B.push({ list: tn.map(x => x.tag + (x.motivo ? ' — ' + x.motivo : '')) }); }
+  B.push({ h: 'Etiquetas y campos de Jira' }); B.push({ kv: fieldsOf(t) });
+  const act = (t.actas || []);
+  if (act.length) { B.push({ h: 'Actas de las ceremonias' }); B.push({ list: act.map(a => new Date(a.at).toLocaleDateString('es-PE') + ' · ' + (a.reunion || 'Reunión') + (a.cambioAlcance && a.cambioAlcance !== 'No' ? ' · Cambio de alcance: ' + a.cambioAlcance : '')) }); }
+  B.push({ foot: 'Generado con el Estudio de Requerimientos WSJF · Empresa' });
+  return B;
+}
+function render(t, fmt) {
+  const L = [];
+  const lk = (n, u) => !u ? n + ' (enlace por agregar)' : fmt === 'md' ? '[' + n + '](' + u + ')' : fmt === 'wiki' ? '[' + n + '|' + u + ']' : n + ': ' + u;
+  const bul = fmt === 'wiki' ? '* ' : '- ';
+  for (const b of docBlocks(t)) {
+    if (b.h) L.push('', fmt === 'md' ? '## ' + b.h : fmt === 'wiki' ? 'h2. ' + b.h : b.h.toUpperCase());
+    else if (b.sub) L.push('', fmt === 'md' ? '**' + b.sub + '**' : fmt === 'wiki' ? '*' + b.sub + '*' : b.sub + ':');
+    else if (b.para) L.push('', b.para);
+    else if (b.kv) for (const [k, v] of (L.push(''), b.kv)) L.push(fmt === 'md' ? '**' + k + ':** ' + v + '  ' : fmt === 'wiki' ? '*' + k + ':* ' + v : k + ': ' + v);
+    else if (b.story) { const [a, q, p] = b.story; L.push(fmt === 'md' ? 'Como **' + a + '**, quiero **' + q + '**, para **' + p + '**.' : fmt === 'wiki' ? 'Como *' + a + '*, quiero *' + q + '*, para *' + p + '*.' : 'Como ' + a + ', quiero ' + q + ', para ' + p + '.'); }
+    else if (b.list) for (const x of b.list) L.push(bul + x);
+    else if (b.links) { if (b.lead) L.push(b.lead); for (const [n, u] of b.links) L.push(bul + lk(n, u)); }
+    else if (b.code) { if (fmt === 'md') L.push('```' + (b.lang || ''), b.code, '```'); else if (fmt === 'wiki') L.push('{code}', b.code, '{code}'); else L.push(...b.code.split('\n').map(x => '    ' + x)); }
+    else if (b.table) { const { head } = b.table, rows = b.table.rows || [b.table.row];
+      if (fmt === 'md') L.push('| ' + head.join(' | ') + ' |', '|' + head.map(() => '---').join('|') + '|', ...rows.map(r => '| ' + r.join(' | ') + ' |'));
+      else if (fmt === 'wiki') L.push('||' + head.join('||') + '||', ...rows.map(r => '|' + r.join('|') + '|'));
+      else rows.forEach(r => L.push(rows.length > 1 ? bul + head.map((h, i) => h + ': ' + r[i]).join(' · ') : head.map((h, i) => h + ': ' + r[i]).join('\n'))); }
+    else if (b.checks) for (const [k, ok] of b.checks) L.push(fmt === 'md' ? '- [' + (ok ? 'x' : ' ') + '] ' + k : fmt === 'wiki' ? (ok ? '(/) ' : '(x) ') + k : (ok ? '[x] ' : '[ ] ') + k);
+    else if (b.foot) L.push('', fmt === 'txt' ? b.foot : '_' + b.foot + '_');
+  }
+  return L.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+const summaryOf = (t) => codeOf(t) + ' · ' + (t.titulo || 'Sin título');
+function tagsOf(t) {
+  const c = compute(t);
+  return [t.producto, c.via ? 'via-' + c.via.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') : null, c.wsjf != null ? 'wsjf-' + c.wsjf : null, (designScore(t) ?? 0) >= 3 ? 'requiere-diseno' : null, ...String(t.tagsExtra || '').split(',').map(s => s.trim())].filter(Boolean);
+}
+function fieldsOf(t) {
+  const c = compute(t), ti = tipoInfo(t.tipo);
+  return [['Issue Type', t.tipo ? ti[1] : PD], ['Componentes', t.area ? [t.area].concat(extrasOf(t)).join(', ') : PD], ['Etiquetas', tagsOf(t).join(', ') || '—'], ['Informador (Reporter)', t.pm || 'Product Manager'],
+    ['Responsable (Assignee)', c.via === 'Strategic' || !c.via ? 'Product Owner' : 'Tech Lead'], ['Fecha de vencimiento', fmtDate(t.fecha) || '—']];
+}
+
+/* ---------- DOCX mínimo con JSZip ---------- */
+const xe = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const run = (t, o = {}) => '<w:r><w:rPr><w:rFonts w:ascii="' + (o.mono ? 'Consolas' : 'Calibri') + '" w:hAnsi="' + (o.mono ? 'Consolas' : 'Calibri') + '" w:cs="Calibri"/>' + (o.b ? '<w:b/>' : '') + (o.i ? '<w:i/>' : '') + (o.color ? '<w:color w:val="' + o.color + '"/>' : '') + '<w:sz w:val="' + (o.sz || 21) + '"/></w:rPr><w:t xml:space="preserve">' + xe(t) + '</w:t></w:r>';
+const para = (runs, o = {}) => '<w:p><w:pPr>' + (o.shd ? '<w:shd w:val="clear" w:color="auto" w:fill="' + o.shd + '"/>' : '') + '<w:spacing w:before="' + (o.before || 0) + '" w:after="' + (o.after ?? 80) + '"/>' + (o.ind ? '<w:ind w:left="360" w:hanging="220"/>' : '') + '</w:pPr>' + runs + '</w:p>';
+function docxBody(t, first) {
+  let x = para(run(codeOf(t), { b: true, sz: 20, color: '0B7A74' }), { before: first ? 0 : 480, after: 40 }) + para(run(t.titulo || 'Sin título', { b: true, sz: 30, color: '1B2733' }), { after: 160 });
+  for (const b of docBlocks(t)) {
+    if (b.h) x += para(run(b.h, { b: true, sz: 24, color: '0B7A74' }), { before: 220, after: 80 });
+    else if (b.sub) x += para(run(b.sub, { b: true, sz: 20, color: '5B6977' }), { before: 60, after: 40 });
+    else if (b.para) x += para(run(b.para));
+    else if (b.kv) for (const [k, v] of b.kv) x += para(run(k + ': ', { b: true }) + run(v), { after: 40 });
+    else if (b.story) x += para(run('Como ') + run(b.story[0], { b: true }) + run(', quiero ') + run(b.story[1], { b: true }) + run(', para ') + run(b.story[2], { b: true }) + run('.'));
+    else if (b.list) for (const i of b.list) x += para(run('•  ' + i), { ind: true, after: 40 });
+    else if (b.links) { if (b.lead) x += para(run(b.lead, { b: true }), { after: 40 }); for (const [n, u] of b.links) x += para(run('•  ' + n + ': ') + run(u || 'enlace por agregar', { color: '2D5DB8' }), { ind: true, after: 40 }); }
+    else if (b.code) for (const ln of b.code.split('\n')) x += para(run(ln, { mono: true, sz: 19 }), { shd: 'F2F5F7', after: 0 });
+    else if (b.checks) for (const [k, ok] of b.checks) x += para(run((ok ? '☑  ' : '☐  ') + k), { after: 40 });
+    else if (b.table) {
+      const cell = (v, h) => '<w:tc><w:tcPr><w:tcW w:w="1500" w:type="dxa"/>' + (h ? '<w:shd w:val="clear" w:color="auto" w:fill="E0F1EF"/>' : '') + '</w:tcPr>' + para(run(v, { b: h, sz: 19 }), { after: 0 }) + '</w:tc>';
+      const bd = '<w:tblBorders>' + ['top','left','bottom','right','insideH','insideV'].map(s => '<w:' + s + ' w:val="single" w:sz="4" w:color="C9D3DA"/>').join('') + '</w:tblBorders>';
+      x += '<w:tbl><w:tblPr><w:tblW w:w="9000" w:type="dxa"/>' + bd + '<w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>' + b.table.head.map(() => '<w:gridCol w:w="1500"/>').join('') + '</w:tblGrid>' +
+        '<w:tr>' + b.table.head.map(h => cell(h, true)).join('') + '</w:tr>' + (b.table.rows || [b.table.row]).map(r => '<w:tr>' + r.map(v => cell(String(v), false)).join('') + '</w:tr>').join('') + '</w:tbl>' + para('', { after: 60 });
+    }
+    else if (b.foot) x += para(run(b.foot, { i: true, sz: 17, color: '5B6977' }), { before: 160 });
+  }
+  return x;
+}
+async function makeDocx(list, title) {
+  if (!window.JSZip) throw new Error('nozip');
+  const zip = new JSZip();
+  zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+  zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+  let body = title ? para(run(title, { b: true, sz: 34, color: '1B2733' }), { after: 120 }) + para(run('Empresa · ' + new Date().toLocaleDateString('es-PE'), { sz: 18, color: '5B6977' }), { after: 240 }) : '';
+  list.forEach((t, i) => body += docxBody(t, i === 0 && !title));
+  zip.file('word/document.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body + '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>');
+  return zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+
+/* ---------- utilidades UI ---------- */
+let toastT;
+function toast(m) { const el = $('toast'); el.textContent = m; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 2600); }
+function copyText(text, el) {
+  const fallback = () => { if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast('Texto seleccionado: presiona Ctrl+C (Cmd+C en Mac)'); };
+  try { navigator.clipboard.writeText(text).then(() => toast('Copiado'), fallback); } catch (e) { fallback(); }
+}
+let DL = null;
+async function save(filename, data) {
+  if (!DL) { toast('Las descargas no están disponibles en esta vista. Copia el texto en su lugar.'); return; }
+  try { await DL.save({ filename, data }); toast('Archivo listo: ' + filename); }
+  catch (e) { if (e && e.code === 'declined') return; toast(e && e.code === 'rate_limited' ? 'Ya hay una descarga pendiente; inténtalo en un momento.' : 'No se pudo descargar. Copia el texto en su lugar.'); }
+}
+const fname = (s) => s.replace(/[^\w.\-]+/g, '_');
+
+/* ---------- listas dinámicas ---------- */
+const LISTS = {
+  anexos: { blank: { tipo: '', nombre: '', url: '' }, cols: [['tipo', 'select', ANEXO_T, 'Tipo de anexo'], ['nombre', 'text', 'Nombre o descripción', 'Nombre del anexo'], ['url', 'url', 'Enlace (Drive, SharePoint…)', 'Enlace del anexo']] },
+  videos: { blank: { ceremonia: '', fecha: '', url: '' }, cols: [['ceremonia', 'select', CEREMONIAS, 'Ceremonia'], ['fecha', 'date', '', 'Fecha de la ceremonia'], ['url', 'url', 'Enlace a la grabación', 'Enlace del video']] },
+  tagsNew: { blank: { tag: '', motivo: '' }, cols: [['tag', 'text', 'nueva-etiqueta', 'Etiqueta propuesta'], ['motivo', 'text', 'Para qué sirve', 'Motivo de la etiqueta']] },
+};
+function renderList(name) {
+  const L = LISTS[name], arr = cur[name] || (cur[name] = []);
+  $(name).innerHTML = arr.length ? arr.map((row, i) => '<div class="rowx"' + (L.cols.length === 2 ? ' style="grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) auto"' : '') + '>' +
+    L.cols.map(([k, type, opt, aria]) => type === 'select'
+      ? '<select id="' + name + '-' + i + '-' + k + '" data-l="' + name + '" data-i="' + i + '" data-k="' + k + '" aria-label="' + aria + '"><option value="">' + PD + '</option>' + opt.map(o => '<option' + (o === row[k] ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>'
+      : '<input id="' + name + '-' + i + '-' + k + '" type="' + type + '" data-l="' + name + '" data-i="' + i + '" data-k="' + k + '" aria-label="' + aria + '" placeholder="' + esc(opt) + '" value="' + esc(row[k]) + '">').join('') +
+    '<button type="button" class="btn sm danger" data-rm="' + name + '" data-i="' + i + '" aria-label="Quitar">Quitar</button></div>').join('')
+    : '<p class="sub" style="margin:0">Sin registros.</p>';
+}
+
+/* ---------- formulario ---------- */
+const FIELDS = ['areasExtra','tipo','area','corr','titulo','sistema','sistemaOtro','producto','estado','pm','po','tl','contacto','objetivo','problema','kpi','urgencia','clase','fecha','como','quiero','para','incluye','noIncluye','modulos','vistas','reglas','criterios','figma','prototipo','nfNeg','nfTl','calcHoy','calcNuevo','calcEj','deps','tagsExtra','valor','crit','riesgo','justif'];
+let cur = {}, editingId = null;
+const opt = (v, l) => '<option value="' + esc(v) + '">' + esc(l ?? v) + '</option>';
+function fill() {
+  $('tipo').innerHTML = opt('', PD) + TIPOS.map(t => opt(t[0], t[0] + ' · ' + t[1])).join('');
+  $('area').innerHTML = opt('', PD) + AREAS.map(a => opt(a[0], a[0] + ' · ' + a[1])).join('');
+  $('sistema').innerHTML = opt('', PD) + SISTEMAS.map(s => opt(s)).join('');
+  $('urgencia').innerHTML = opt('', PD) + URGENCIAS.map(s => opt(s)).join('');
+  $('clase').innerHTML = opt('', PD) + CLASES.map(c => opt(c)).join('');
+  $('estado').innerHTML = ESTADOS.map(c => opt(c)).join('');
+  $('fEstado').innerHTML += ESTADOS.map(c => opt(c)).join('');
+  for (const id of ['valor','crit','riesgo']) $(id).innerHTML = opt('', PD) + RUBRIC[id].s.map(([v, l]) => opt(v, v + ' · ' + l)).join('');
+  const scale = ['valor', 'crit', 'riesgo'].map(k => '<h3 style="font-size:13px;margin:12px 0 4px">' + RUBRIC[k].n + ' <span class="muted" style="font-weight:400">· ' + RUBRIC[k].q + '</span></h3>' + rubTable(k)).join('') +
+    '<h3 style="font-size:13px;margin:12px 0 4px">Tamaño <span class="muted" style="font-weight:400">· lo estiman Tech Lead y desarrolladores</span></h3><table class="rubt"><thead><tr><th>Valor</th><th>Nivel</th><th>Cuándo elegirlo</th><th>Ejemplo</th></tr></thead><tbody>' +
+    [[1,'Quick Win','Hasta 2 días; cambio puntual sin dependencias','Texto legal del simulador'],[2,'Minor','Hasta 1 semana; un componente, riesgo técnico bajo','Alertas de vencimiento'],[3,'Moderate','1 a 2 semanas; varios componentes o una integración simple','Onboarding de inversionistas'],[5,'Major','2 a 4 semanas; integraciones o proveedor externo','OCR de facturas y DNI'],[8,'Large Scale','Más de 1 mes; se divide antes de «Listo»','Reporte regulatorio completo']].map(([v,l,d,e]) => '<tr><td>' + v + '</td><td class="lvl">' + l + '</td><td>' + d + '</td><td class="muted">' + e + '</td></tr>').join('') + '</tbody></table>';
+  $('scaleCard').innerHTML = scale; $('scaleGuide').innerHTML = scale;
+  $('i_area').innerHTML = opt('', PD) + AREAS.map(a => opt(a[0], a[0] + ' · ' + a[1])).join('');
+  $('i_sistema').innerHTML = opt('', PD) + SISTEMAS.map(x => opt(x)).join('');
+  for (const id of ['i_valor', 'i_crit', 'i_riesgo']) { const k = id.slice(2); $(id).innerHTML = opt('', PD) + RUBRIC[k].s.map(([v, l]) => opt(v, v + ' · ' + l)).join(''); }
+  $('i_talla').innerHTML = opt('', PD) + TALLAS.map(t => opt(t[0], t[1] + ' · ' + t[0])).join('');
+  $('i_decision').innerHTML = DECISIONS.map(d => opt(d)).join('');
+  $('tallas').innerHTML = TALLAS.map(t => '<button type="button" aria-pressed="false" data-t="' + t[0] + '"><b>' + t[1] + '</b>' + t[0] + '<br><small>' + t[2] + '</small></button>').join('') + '<button type="button" class="tbd" aria-pressed="false" data-t=""><b>?</b>' + PD + '<br><small>Sin talla aún</small></button>';
+  $('nfChips').innerHTML = NF_CHIPS.map(c => '<button type="button" class="chip" data-nf="' + esc(c) + '">+ ' + esc(c) + '</button>').join('');
+  $('tiposTbl').innerHTML = TIPOS.map(t => '<tr><td class="code">' + t[0] + '</td><td>' + t[1] + '</td><td class="muted">' + t[2] + ' · ' + t[3] + '</td></tr>').join('');
+  $('dorList').innerHTML = compute({}).dor.map(d => '<li>' + d[0] + '</li>').join('');
+  $('raci').innerHTML = '<thead><tr><th>Actividad</th>' + RACI_ROLES.map(r => '<th style="text-align:center">' + r + '</th>').join('') + '</tr></thead><tbody>' +
+    RACI.map(([a, v]) => '<tr><td>' + a + '</td>' + v.map(x => '<td class="' + (x.startsWith('A') ? 'a' : x === 'R' ? 'r' : x === 'C' ? 'c' : 'i') + '">' + x + '</td>').join('') + '</tr>').join('') + '</tbody>';
+  // tooltips: insert a help button after each label's text and in each h2
+  document.querySelectorAll('label.f[data-tip]').forEach(l => {
+    const txtNode = [...l.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+    const wrap = document.createElement('span'); wrap.className = 'lt';
+    wrap.textContent = txtNode.textContent.trim();
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tip'; b.textContent = '?'; b.dataset.tip = l.dataset.tip; b.setAttribute('aria-label', 'Ayuda: ' + l.dataset.tip);
+    wrap.appendChild(b); l.replaceChild(wrap, txtNode);
+  });
+  document.querySelectorAll('h2[data-tip]').forEach(h => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tip'; b.textContent = '?'; b.dataset.tip = h.dataset.tip; b.setAttribute('aria-label', 'Ayuda: ' + h.dataset.tip);
+    const ex = h.querySelector('.ex'); h.insertBefore(b, ex || null);
+  });
+}
+function renderSdlc() {
+  const sd = cur.sdlc || (cur.sdlc = {}), ds = designScore(cur);
+  $('sdlc').innerHTML = SDLC.map(([id, n, d, r]) => { const v = sd[id] || {}, est = v.estado || 'Pendiente';
+    return '<div class="sdrow' + (est === 'Listo' ? ' ok' : est === 'No aplica' ? ' na' : '') + '"><div><b>' + n + '</b><small>' + d + (id === 'ux' && ds != null && ds <= 0 ? ' · la evaluación indica que no requiere diseñador' : '') + '</small></div>' +
+      '<select id="sd-' + id + '-estado" data-sd="' + id + '" data-k="estado" aria-label="Estado de ' + n + '">' + SD_EST.map(e => '<option' + (e === est ? ' selected' : '') + '>' + e + '</option>').join('') + '</select>' +
+      '<input id="sd-' + id + '-resp" data-sd="' + id + '" data-k="resp" aria-label="Responsable de ' + n + '" placeholder="' + r + '" value="' + esc(v.resp || '') + '">' +
+      '<input id="sd-' + id + '-link" data-sd="' + id + '" data-k="link" type="url" aria-label="Enlace de ' + n + '" placeholder="Enlace al documento" value="' + esc(v.link || '') + '"></div>'; }).join('');
+  sdlcProgress();
+}
+function sdlcProgress() { const sd = cur.sdlc || {}, ap = SDLC.filter(([id]) => (sd[id] || {}).estado !== 'No aplica'), ok = ap.filter(([id]) => (sd[id] || {}).estado === 'Listo').length; $('sdlcProg').textContent = ok + ' de ' + ap.length + ' listas'; }
+function load(t, isExample) {
+  cur = JSON.parse(JSON.stringify(t));
+  for (const k of FIELDS) $(k).value = t[k] ?? '';
+  renderPick('areasPick', 'areasExtra', 'area');
+  for (const n of Object.keys(LISTS)) { cur[n] = Array.isArray(t[n]) ? JSON.parse(JSON.stringify(t[n])) : []; renderList(n); }
+  cur.sdlc = JSON.parse(JSON.stringify(t.sdlc || {})); renderSdlc();
+  cur.disc = JSON.parse(JSON.stringify(t.disc || {})); cur.discCustom = JSON.parse(JSON.stringify(t.discCustom || [])); cur.design = Object.assign({}, t.design || {});
+  setTalla(t.talla || '');
+  $('exTag').hidden = !isExample;
+  renderDisc(); $('histWrap').hidden = true;
+  update();
+}
+function setTalla(n) { cur.talla = n; document.querySelectorAll('#tallas button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === n))); }
+function nextCorr(area) {
+  const nums = tickets.filter(t => t.area === area).map(t => parseInt(t.corr) || 0);
+  return String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3, '0');
+}
+function readForm() { for (const k of FIELDS) cur[k] = $(k).value; cur.valor = +cur.valor || ''; cur.crit = +cur.crit || ''; cur.riesgo = +cur.riesgo || ''; }
+function update() {
+  renderPick('areasPick', 'areasExtra', 'area');
+  readForm();
+  try { const gk = gherkinCheck(cur); $('ghkInfo').textContent = gk ? gk.n + ' escenario(s) Gherkin' + (gk.bad.length ? ' · ' + gk.bad.length + ' sin Dado/Cuando/Entonces' : ' · correctos') : 'Escribe Escenario: y luego Dado, Cuando, Entonces.'; } catch (e) {}
+  $('codigo').value = codeOf(cur);
+  $('otroWrap').hidden = cur.sistema !== 'Otro';
+  document.querySelectorAll('#f select').forEach(s => s.classList.toggle('pending', s.value === '' && !s.dataset.l));
+  const c = compute(cur), fmt = $('fmt').value;
+  $('mCod').textContent = c.cod ?? '–';
+  $('mWsjf').textContent = c.wsjf ?? '–';
+  $('mVia').innerHTML = c.via ? '<span class="pill ' + viaCls(c.via) + '">' + c.via + '</span>' : '<span class="pill p-none">Triaje</span>';
+  $('mDor').textContent = c.dor.filter(d => d[1]).length + '/' + c.dor.length;
+  $('alerts').innerHTML = c.alerts.map(([k, b, m]) => '<div class="alert a-' + k + '"><b>' + esc(b) + '</b><span>' + esc(m) + '</span></div>').join('');
+  const rk = rankOf(cur);
+  $('next').innerHTML = '<b>Siguiente paso.</b> ' + NEXT[c.via] + (rk ? ' <span class="muted">Posición estimada en tu backlog: ' + rk.pos + ' de ' + rk.total + '.</span>' : '');
+  for (const k of ['valor', 'crit', 'riesgo']) { const r = rubOf(k, cur[k]), el = $('h-' + k); el.className = 'rub' + (r ? '' : ' empty'); el.innerHTML = r ? '<b>' + r[0] + ' · ' + r[1] + ':</b> ' + esc(r[2]) + ' <span class="muted">Ej.: ' + esc(r[3]) + '</span>' : esc(RUBRIC[k].q) + ' Elige un nivel para ver su significado.'; }
+  $('calcLine').innerHTML = 'CoD = ' + (cur.valor || '?') + ' + ' + (cur.crit || '?') + ' + ' + (cur.riesgo || '?') + ' = <strong>' + (c.cod ?? '?') + '</strong> · WSJF = ' + (c.cod ?? '?') + ' ÷ ' + (c.tv ?? '?') + ' = <strong>' + (c.wsjf ?? '?') + '</strong>';
+  $('outSum').textContent = summaryOf(cur);
+  $('outDesc').textContent = render(cur, fmt);
+  $('outFields').innerHTML = fieldsOf(cur).map(([k, v]) => '<div><b>' + esc(k) + ':</b> ' + esc(v) + '</div>').join('');
+  $('btnSave').textContent = editingId ? 'Actualizar en backlog' : 'Guardar en backlog';
+  renderDiscCtx();
+}
+
+/* ---------- backlog (db) ---------- */
+let tickets = [], COL = null, MODE = 'memory';
+function setStatus(mode, txt) { MODE = mode; $('dot').className = 'dot ' + (mode === 'db' ? 'on' : mode === 'local' ? 'local' : ''); $('statusTxt').textContent = txt; }
+function persistLocal() { if (MODE !== 'local') return; try { localStorage.setItem('wsjf-backlog', JSON.stringify(tickets)); } catch (e) {} }
+const dup = (code, id) => tickets.some(t => t.codigo === code && t.id !== id);
+async function saveTicket(meta) {
+  readForm();
+  if (!(cur.titulo || '').trim()) { toast('Escribe un título antes de guardar.'); $('titulo').focus(); return; }
+  const id = editingId || ('t-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+  const c = compute(cur);
+  const doc = {}; for (const k of FIELDS) doc[k] = cur[k] ?? ''; for (const n of Object.keys(LISTS)) doc[n] = cur[n] || [];
+  doc.sdlc = cur.sdlc || {};
+  doc.disc = cur.disc || {}; doc.discCustom = cur.discCustom || []; doc.design = cur.design || {};
+  const prev = tickets.find(x => x.id === id); doc.history = ((prev && prev.history) || []).concat(prev ? [{ at: prev.updatedAt, data: stripHist(prev) }] : []).slice(-HIST_MAX);
+  doc.talla = cur.talla || ''; doc.codigo = codeOf(cur); doc.wsjf = c.wsjf; doc.cod = c.cod; doc.via = c.via; doc.updatedAt = new Date().toISOString();
+  if (meta && meta.label) { doc.versionLabel = meta.label; doc.versionNote = meta.note || ''; }
+  doc.actas = ((prev && prev.actas) || []).concat(meta && meta.acta ? [meta.acta] : []).slice(-30);
+  if (cur.tipo && cur.area && dup(doc.codigo, id)) { toast('Ya existe un ticket con el código ' + doc.codigo + '. Cambia el correlativo.'); return; }
+  try {
+    if (COL) await COL.doc(id).set(doc);
+    else { const i = tickets.findIndex(t => t.id === id); const row = Object.assign({ id }, doc); if (i >= 0) tickets[i] = row; else tickets.push(row); persistLocal(); renderBacklog(); }
+    editingId = id; $('exTag').hidden = true; update();
+    toast(doc.codigo + ' guardado en el backlog');
+    return true;
+  } catch (e) { toast(e && e.code === 'quota_exceeded' ? 'El backlog está lleno: elimina tickets antiguos.' : 'No se pudo guardar. Inténtalo de nuevo.'); return false; }
+}
+async function delTicket(id) {
+  try { if (COL) await COL.doc(id).delete(); else { tickets = tickets.filter(t => t.id !== id); persistLocal(); renderBacklog(); } if (editingId === id) editingId = null; toast('Ticket eliminado'); }
+  catch (e) { toast('No se pudo eliminar.'); }
+}
+async function setEstado(id, estado) {
+  try { if (COL) await COL.doc(id).update({ estado }); else { const t = tickets.find(t => t.id === id); if (t) t.estado = estado; persistLocal(); renderBacklog(); } }
+  catch (e) { toast('No se pudo cambiar el estado.'); }
+}
+function ranked(list) {
+  const evo = list.filter(t => tipoInfo(t.tipo)[2] === 'Evolución' && compute(t).wsjf != null).sort((a, b) => compute(b).wsjf - compute(a).wsjf);
+  const rank = new Map(evo.map((t, i) => [t.id || t.codigo, i + 1]));
+  return [...list].sort((a, b) => (rank.get(a.id || a.codigo) || 999) - (rank.get(b.id || b.codigo) || 999)).map(t => ({ t, r: rank.get(t.id || t.codigo) }));
+}
+let pendingDel = null;
+function renderBacklog() {
+  const q = $('q').value.toLowerCase(), fv = $('fVia').value, fe = $('fEstado').value;
+  const rows = ranked(tickets).filter(({ t }) => (!q || (codeOf(t) + ' ' + t.titulo).toLowerCase().includes(q)) && (!fv || compute(t).via === fv) && (!fe || t.estado === fe));
+  if (!tickets.length) { $('blWrap').innerHTML = '<div class="empty"><p style="margin:0 0 6px;font-weight:600;color:var(--ink)">Tu backlog está vacío</p><p style="margin:0">Completa una ficha y pulsa «Guardar en backlog». Los tickets aparecerán aquí ordenados por WSJF.</p></div>'; return; }
+  if (!rows.length) { $('blWrap').innerHTML = '<div class="empty">Ningún ticket coincide con el filtro.</div>'; return; }
+  $('blWrap').innerHTML = '<table><thead><tr><th class="num">#</th><th>Código</th><th>Título</th><th>Sistema</th><th>Vía</th><th class="num">CoD</th><th>Tamaño</th><th class="num">WSJF</th><th>Estado</th><th>Alerta</th><th></th></tr></thead><tbody>' +
+    rows.map(({ t, r }) => { const c = compute(t); const al = c.alerts.find(a => a[0] === 'crit' || a[0] === 'warn');
+      return '<tr><td class="num">' + (r || '–') + '</td><td class="code">' + esc(codeOf(t)) + '</td><td>' + esc(t.titulo) + '</td><td>' + esc(sistemaOf(t)) + '</td><td>' + (c.via ? '<span class="pill ' + viaCls(c.via) + '">' + c.via + '</span>' : '<span class="pill p-none">Triaje</span>') + '</td><td class="num">' + (c.cod ?? '–') + '</td><td>' + esc(t.talla || PD) + '</td><td class="num"><b>' + (c.wsjf ?? '–') + '</b></td>' +
+      '<td><select data-est="' + t.id + '" aria-label="Estado de ' + esc(codeOf(t)) + '">' + ESTADOS.map(e => '<option' + (e === t.estado ? ' selected' : '') + '>' + e + '</option>').join('') + '</select></td>' +
+      '<td>' + (al ? '<span class="pill ' + (al[0] === 'crit' ? 'a-crit' : 'a-warn') + '">' + esc(al[1].replace(':', '')) + '</span>' : '') + '</td>' +
+      '<td style="white-space:nowrap">' + (pendingDel === t.id ? '<span class="inline-confirm">¿Eliminar? <button class="btn sm danger" data-delok="' + t.id + '">Sí</button><button class="btn sm" data-delno="1">No</button></span>' :
+      '<button class="btn sm" data-edit="' + t.id + '">Editar</button> <button class="btn sm" data-hist="' + t.id + '">Historial</button> <button class="btn sm" data-copy="' + t.id + '">Copiar</button> <button class="btn sm danger" data-del="' + t.id + '">Eliminar</button>') + '</td></tr>'; }).join('') + '</tbody></table>';
+}
+function csv(list) {
+  const q = (s) => '"' + String(s ?? '').replace(/"/g, '""') + '"';
+  const head = ['Summary','Issue Type','Component/s','Labels','Due Date','Description'];
+  return [head.map(q).join(',')].concat(list.map(t => [summaryOf(t), t.tipo ? tipoInfo(t.tipo)[1] : '', t.area, tagsOf(t).join(' '), t.fecha || '', render(t, 'wiki')].map(q).join(','))).join('\r\n');
+}
+
+/* ---------- simulación ---------- */
+function simulate() {
+  const umb = +$('sUmb').value, cup = +$('sCup').value; $('sUmbV').textContent = umb; $('sCupV').textContent = cup;
+  const src = $('sSrc').value === 'bl' ? tickets.filter(t => tipoInfo(t.tipo)[2] === 'Evolución') : SIM_EJ;
+  const items = src.map(t => ({ t, c: compute(t) })).filter(x => x.c.cod != null);
+  const cols = { wait: [], split: [], prio: [], ready: [] };
+  for (const x of items) { if (x.c.cod < umb) cols.wait.push(x); else if (x.t.talla === 'Large Scale') cols.split.push(x); else if (x.c.wsjf != null) cols.prio.push(x); }
+  cols.prio.sort((a, b) => b.c.wsjf - a.c.wsjf); cols.ready = cols.prio.slice(0, cup); cols.prio = cols.prio.slice(cup);
+  const meta = [['ready', 'Listo · entra al ciclo', 'Mejor WSJF dentro del cupo de WIP (C4)', 'c-ready'], ['prio', 'Priorizado · espera cupo', 'Pasa los filtros, sin cupo en este ciclo', 'c-prio'], ['split', 'Dividir', 'Large Scale: MoSCoW y vuelve a C2', 'c-split'], ['wait', 'En espera', 'CoD menor al umbral (filtro C1)', 'c-wait']];
+  $('board').innerHTML = meta.map(([k, h, r, cls]) => '<div class="col ' + cls + '"><h3>' + h + ' <em>' + cols[k].length + '</em></h3><p class="rule">' + r + '</p>' +
+    (cols[k].length ? cols[k].map(({ t, c }) => '<div class="tk"><div class="row"><code>' + esc(t.codigo || codeOf(t)) + '</code><b style="font-family:var(--f-mono)">' + (c.wsjf ?? '–') + '</b></div><div>' + esc(t.titulo) + '</div><div class="row"><span class="muted" style="font-size:11.5px">CoD ' + c.cod + ' · ' + esc(t.talla || PD) + '</span>' + (c.via ? '<span class="pill ' + viaCls(c.via) + '">' + c.via + '</span>' : '') + '</div></div>').join('') : '<p class="rule" style="font-style:italic">Ningún ticket</p>') + '</div>').join('');
+  const all = items.filter(x => x.c.wsjf != null).sort((a, b) => b.c.wsjf - a.c.wsjf), mx = Math.max(1, ...all.map(x => x.c.wsjf));
+  const readySet = new Set(cols.ready);
+  $('bars').innerHTML = all.length ? all.map(x => '<div class="bar"><span class="t" title="' + esc(x.t.titulo) + '"><code style="font:600 11.5px var(--f-mono)">' + esc(x.t.codigo || codeOf(x.t)) + '</code> ' + esc(x.t.titulo) + '</span><span class="track"><span class="fill' + (readySet.has(x) ? '' : ' mute') + '" style="width:' + (x.c.wsjf / mx * 100).toFixed(1) + '%;display:block"></span></span><b>' + x.c.wsjf + '</b></div>').join('') : '<div class="empty">No hay tickets de evolución con puntajes completos en el backlog.</div>';
+  $('simSum').textContent = items.length ? 'Con umbral ' + umb + ' y cupo ' + cup + ': ' + cols.ready.length + ' entran al ciclo, ' + cols.prio.length + ' esperan cupo, ' + cols.split.length + ' se dividen y ' + cols.wait.length + ' quedan en espera. Las barras en color son las que entran.' : '';
+}
+
+/* ---------- discovery y delivery ---------- */
+const CER_SHORT = ['C1', 'C2', 'C3', 'C4', 'Kickoff'];
+const CER_NAME = { C1: 'C1 · Presentación de la necesidad', C2: 'C2 · Revisión funcional', C3: 'C3 · Refinamiento técnico', C4: 'C4 · Validación y priorización', Kickoff: 'Kickoff' };
+const QBANK = [
+  ['q1', 'Discovery', 'C1', '¿Qué problema resolvemos y para quién?', 'Busca un usuario concreto y una situación real, no una solución.'],
+  ['q2', 'Discovery', 'C1', '¿Cómo se resuelve hoy y cuánto cuesta (tiempo, dinero, errores)?', 'Sirve para el valor de negocio y la sección «Cómo funciona hoy».'],
+  ['q3', 'Discovery', 'C1', '¿Qué pasa si no lo hacemos en los próximos 3 meses?', 'Define la criticidad temporal.'],
+  ['q4', 'Discovery', 'C1', '¿Cómo mediremos el éxito? ¿Cuál es el KPI y su valor actual?', 'Sin valor actual no hay línea base.'],
+  ['q5', 'Discovery', 'C1', '¿Hay una fecha límite real? ¿Por qué esa fecha?', 'Si hay regulador o contrato, la clase es Fecha fija.'],
+  ['q6', 'Discovery', 'C1', '¿Hay una norma, auditoría o regulador involucrado?', 'Sube el puntaje de riesgo y puede volverlo REG.'],
+  ['q7', 'Discovery', 'C2', '¿Quiénes son los usuarios y qué roles o permisos tienen?', 'Completa el «Como» de la historia.'],
+  ['q8', 'Discovery', 'C2', '¿Qué sistema y qué módulos se tocan: Factoring Admin, Public o ambos?', 'Completa sistema, módulos y vistas.'],
+  ['q9', 'Discovery', 'C2', '¿Cuáles son las reglas de negocio y sus excepciones?', 'Pide casos límite: montos, fechas, estados.'],
+  ['q10', 'Discovery', 'C2', '¿Qué entra y qué no entra en esta entrega (MoSCoW)?', 'Lo Won\'t va a «no incluye».'],
+  ['q11', 'Discovery', 'C2', '¿Hay cálculos? ¿Tienen un Excel o ejemplo de cómo funciona hoy?', 'Adjúntalo como anexo.'],
+  ['q12', 'Discovery', 'C2', '¿Qué datos se necesitan y de dónde vienen?', 'Detecta dependencias de datos.'],
+  ['q13', 'Discovery', 'C2', '¿Cambian pantallas o la experiencia del cliente?', 'Alimenta la evaluación de diseñador.'],
+  ['q14', 'Delivery', 'C3', '¿Qué componentes, integraciones o proveedores intervienen?', 'Ayuda a estimar el tamaño.'],
+  ['q15', 'Delivery', 'C3', '¿Qué riesgos técnicos o dudas requieren un spike?', 'Si hay mucha incertidumbre, crea un SPK.'],
+  ['q16', 'Delivery', 'C3', '¿Qué criterios no funcionales aplican (rendimiento, seguridad, auditoría)?', 'Regístralos como «mencionados por el Tech Lead».'],
+  ['q17', 'Delivery', 'C3', '¿Se puede dividir en entregas más pequeñas?', 'Obligatorio si sale Large Scale.'],
+  ['q18', 'Delivery', 'C3', '¿Cómo lo vamos a probar y qué datos de prueba necesitamos?', 'Validación define el plan desde aquí.'],
+  ['q19', 'Delivery', 'C4', '¿El puntaje WSJF refleja lo conversado? ¿Alguien lo objeta?', 'Ajusta y anota la justificación.'],
+  ['q20', 'Delivery', 'C4', '¿Cumple la Definition of Ready?', 'Revisa el contador DoR de la ficha.'],
+  ['q21', 'Delivery', 'C4', '¿Hay cupo en el WIP del próximo ciclo?', 'Si no, queda en Priorizado.'],
+  ['q22', 'Delivery', 'C4', '¿Qué dependencias deben resolverse antes de empezar?', 'Asigna responsable a cada una.'],
+  ['q23', 'Delivery', 'Kickoff', '¿Están claros alcance, responsables y fechas?', 'Confírmalo en voz alta con el equipo.'],
+  ['q24', 'Delivery', 'Kickoff', '¿Cuál es el plan de salida a producción y de comunicación?', 'Incluye a soporte y al área.'],
+  ['q25', 'Delivery', 'Kickoff', '¿Quién valida la entrega y cuándo?', 'Normalmente el contacto del área con el PO.'],
+  ['q26', 'Delivery', 'Kickoff', '¿Cuándo y cómo mediremos el KPI después de salir?', 'Agenda la revisión del resultado.'],
+];
+const DESIGN_CRIT = [
+  ['d1', 'Hay pantallas nuevas o un flujo nuevo', 2], ['d2', 'Cambia la experiencia del cliente en Public', 2], ['d3', 'Se modifica la navegación o la estructura de una vista', 2],
+  ['d4', 'Hay que validarlo con usuarios antes de construir', 2], ['d5', 'Necesita componentes que no existen en el sistema de diseño', 1],
+  ['d6', 'Solo cambian textos, validaciones o lógica interna, sin cambio visual', -3], ['d7', 'Es un proceso batch, reporte o integración sin interfaz', -3]];
+function designScore(t) {
+  const d = t.design || {}; if (!DESIGN_CRIT.some(c => d[c[0]])) return null;
+  return DESIGN_CRIT.reduce((s, c) => s + (d[c[0]] ? c[2] : 0), 0);
+}
+const designVerdict = (sc) => sc == null ? ['p-none', 'Sin evaluar', 'Marca los criterios que aplican al ticket.'] : sc >= 3 ? ['p-completa', 'Sí requiere diseñador', 'Pide diseño en Figma y prototipo antes del refinamiento técnico (C3).'] : sc >= 1 ? ['p-agil', 'Consultar con diseño', 'Puede bastar un ajuste sobre componentes existentes; valida con el diseñador en 15 min.'] : ['p-rapida', 'No requiere diseñador', 'El equipo puede construir con los componentes actuales.'];
+function discQuestions(t) { t = t || cur; return QBANK.map(([id, fase, cer, q, hint]) => ({ id, fase, cer, q, hint })).concat((t.discCustom || []).map(c => ({ id: c.id, fase: c.fase || (['C3', 'C4', 'Kickoff'].includes(c.cer) ? 'Delivery' : 'Discovery'), cer: c.cer || 'C2', q: c.q, hint: 'Pregunta propia', custom: true }))); }
+function renderDisc() {
+  const f = $('discCer').value, d = cur.disc || {}, all = discQuestions();
+  const list = all.filter(x => !f || x.cer === f);
+  let html = '';
+  for (const fase of ['Discovery', 'Delivery']) {
+    const qs = list.filter(x => x.fase === fase); if (!qs.length) continue;
+    html += '<div class="card"><h2>' + fase + ' <span class="muted" style="font-weight:400;font-size:12.5px">' + (fase === 'Discovery' ? '· entender el problema y el valor (C1–C2)' : '· preparar la construcción y la salida (C3, C4 y kickoff)') + '</span></h2><div class="qlist">';
+    for (const cer of CER_SHORT) {
+      const g = qs.filter(x => x.cer === cer); if (!g.length) continue;
+      html += '<p class="qcer">' + CER_NAME[cer] + '</p>';
+      html += g.map(x => { const st = d[x.id] || {}; return '<div class="q' + (st.ok ? ' done' : '') + '"><input type="checkbox" id="qc-' + x.id + '" data-q="' + x.id + '"' + (st.ok ? ' checked' : '') + ' aria-label="Marcar como preguntada"><div class="qb"><label for="qc-' + x.id + '">' + esc(x.q) + '</label><small>' + esc(x.hint) + '</small><input id="qa-' + x.id + '" data-qa="' + x.id + '" placeholder="Respuesta o acuerdo" value="' + esc(st.ans || '') + '" aria-label="Respuesta"></div>' + (x.custom ? '<button type="button" class="btn sm danger" data-qdel="' + x.id + '">Quitar</button>' : '') + '</div>'; }).join('');
+    }
+    html += '</div></div>';
+  }
+  $('discQ').innerHTML = html || '<div class="card empty">No hay preguntas para esta ceremonia.</div>';
+  const done = all.filter(x => (d[x.id] || {}).ok).length; $('discProg').textContent = done + ' de ' + all.length + ' preguntadas';
+  const sc = designScore(cur), v = designVerdict(sc);
+  $('designList').innerHTML = DESIGN_CRIT.map(([id, t, w]) => '<label class="dck"><input type="checkbox" data-d="' + id + '"' + ((cur.design || {})[id] ? ' checked' : '') + '><span>' + esc(t) + '</span><em>' + (w > 0 ? '+' : '') + w + '</em></label>').join('');
+  $('designRes').innerHTML = '<span class="pill ' + v[0] + '">' + v[1] + (sc != null ? ' · ' + sc + ' pts' : '') + '</span><p class="sub" style="margin:6px 0 0">' + v[2] + '</p>';
+}
+function renderDiscCtx() { const el = $('discCtx'); if (el) el.textContent = summaryOf(cur); }
+
+/* ---------- consultas a la IA ---------- */
+let SAMPLE = null, aiCtl = null;
+const AI_INTRO = 'Actúas como analista de producto senior en una fintech peruana de factoring y préstamos. El equipo usa Scrumban con priorización WSJF, Jira y Figma. Sistemas: Factoring Admin (operación interna) y Public (canal del cliente). Responde en español, claro y breve, sin introducción ni despedida.';
+function ticketCtx() {
+  const t = cur, c = compute(t), L = [['Código y título', summaryOf(t)], ['Tipo', t.tipo ? tipoInfo(t.tipo)[1] : ''], ['Sistema', t.sistema ? sistemaOf(t) : ''], ['Área', t.area ? [t.area].concat(extrasOf(t)).map(areaName).join(', ') : ''], ['Objetivo', t.objetivo], ['Problema', t.problema], ['KPI', t.kpi], ['Urgencia', t.urgencia], ['Historia', t.como || t.quiero ? 'Como ' + t.como + ', quiero ' + t.quiero + ', para ' + t.para : ''],
+    ['Alcance incluye', t.incluye], ['No incluye', t.noIncluye], ['Módulos', t.modulos], ['Vistas', t.vistas], ['Reglas de negocio', t.reglas], ['Criterios funcionales', t.criterios], ['No funcionales (negocio)', t.nfNeg], ['No funcionales (Tech Lead)', t.nfTl],
+    ['Cálculo hoy', t.calcHoy], ['Cálculo esperado', t.calcNuevo], ['Puntajes', [t.valor && 'Valor ' + t.valor, t.crit && 'Criticidad ' + t.crit, t.riesgo && 'Riesgo ' + t.riesgo, t.talla && 'Tamaño ' + t.talla, c.wsjf != null && 'WSJF ' + c.wsjf].filter(Boolean).join(', ')],
+    ['Respuestas de stakeholders', discQuestions(t).filter(x => ((t.disc || {})[x.id] || {}).ans).map(x => x.q + ' → ' + t.disc[x.id].ans).join('\n')]];
+  return L.filter(x => x[1]).map(x => x[0] + ': ' + x[1]).join('\n');
+}
+function initCtx() { const i = readInit(); return INIT_F.filter(([k]) => i[k]).map(([k, l]) => l + ': ' + i[k]).join('\n'); }
+const AI_TICKET = [
+  ['Preguntas para la próxima ceremonia', 'questions', (cer) => 'Sugiere entre 6 y 10 preguntas concretas para hacer a los stakeholders en la ceremonia «' + (CER_NAME[cer] || 'próxima ceremonia') + '» sobre este requerimiento. Prioriza las que cierran vacíos de la ficha. Devuelve solo la lista, una pregunta por línea, sin numeración.'],
+  ['Vacíos e inconsistencias', null, () => 'Revisa la ficha y lista los vacíos, contradicciones o supuestos no validados, ordenados por impacto. Para cada uno, una línea con qué falta y a quién preguntarlo.'],
+  ['Criterios de aceptación', 'criterios', () => 'Propón entre 3 y 6 escenarios de aceptación en Gherkin en español: cada uno empieza con «Escenario: <nombre>» y sigue con líneas «Dado», «Y», «Cuando», «Entonces». Incluye al menos un caso de error. Sin numeración ni bloques de código. No repitas los existentes.'],
+  ['Reglas de negocio y casos borde', 'reglas', () => 'Propón reglas de negocio y casos borde que falten (montos, fechas, estados, permisos), una por línea, sin numeración. No repitas las existentes.'],
+  ['Criterios no funcionales', 'nfTl', () => 'Propón criterios no funcionales medibles (rendimiento, seguridad, auditoría, disponibilidad, compatibilidad) adecuados a este requerimiento, uno por línea, sin numeración.'],
+  ['Alcance con MoSCoW', null, () => 'Clasifica el alcance en Must, Should, Could y Won\'t para una primera entrega. Un bloque por categoría con viñetas. Cuida que los Must no superen ~60% del esfuerzo.'],
+  ['¿Necesita diseñador?', null, () => 'Evalúa si este requerimiento necesita un diseñador en Figma. Responde con «Sí», «Consultar» o «No» en la primera línea y luego 3 razones breves.'],
+  ['Dividir en historias', null, () => 'Propón cómo dividir este requerimiento en historias más pequeñas que entreguen valor por sí solas. Para cada una: título en infinitivo, valor que entrega y tamaño estimado (Quick Win, Minor, Moderate, Major).'],
+  ['Revisar el puntaje WSJF', null, () => 'Revisa si los puntajes de valor, criticidad, riesgo y tamaño son coherentes con la ficha según esta escala: 1 mínimo, 3 bajo, 5 medio, 8 alto, 13 muy alto, 20 crítico. Indica qué ajustarías y por qué, en viñetas.'],
+];
+const AI_INIT = [
+  ['Mejorar hipótesis y KPI', null, () => 'Reescribe la hipótesis en formato «Creemos que… para… lograremos… Lo sabremos cuando…» y propón 2 o 3 KPI medibles con su línea base sugerida.'],
+  ['Épicas candidatas', 'i_epicas', () => 'Propón entre 3 y 6 épicas candidatas para esta iniciativa, una por línea, con verbo en infinitivo, sin numeración.'],
+  ['Riesgos y supuestos', 'i_riesgos', () => 'Lista los principales riesgos y supuestos a validar, uno por línea, sin numeración, indicando entre paréntesis cómo validarlo.'],
+  ['Preguntas de discovery', null, () => 'Sugiere 8 preguntas de discovery para la primera reunión con los stakeholders de esta iniciativa, una por línea.'],
+  ['Puntaje preliminar razonado', null, () => 'Propón un puntaje preliminar de valor de negocio, criticidad temporal y riesgo/oportunidad (escala 1, 2, 3, 5, 8, 13, 20) y un tamaño (Quick Win a Large Scale), con una línea de justificación por cada uno.'],
+];
+function aiBox(box, prompts, ctxFn, getCer) {
+  const el = $(box);
+  el.querySelector('.aiBtns').innerHTML = prompts.map((p, i) => '<button type="button" class="chip" data-ai="' + i + '">' + esc(p[0]) + '</button>').join('');
+  let last = null;
+  const out = el.querySelector('.aiOut'), useBtn = el.querySelector('.aiUse'), cp = el.querySelector('.aiCopy'), cpp = el.querySelector('.aiCopyPrompt'), stop = el.querySelector('.aiStop');
+  const build = (instr) => AI_INTRO + '\n\nContexto:\n' + (ctxFn() || '(sin datos todavía)') + '\n\nTarea: ' + instr;
+  async function run(instr, target) {
+    const prompt = build(instr); last = { prompt, target, text: '' };
+    useBtn.hidden = !target; cpp.hidden = false;
+    if (!SAMPLE) { out.textContent = 'La consulta directa no está disponible en esta vista. Usa «Copiar prompt» y pégalo en tu asistente de IA.'; return; }
+    aiCtl && aiCtl.abort(); aiCtl = new AbortController(); stop.hidden = false; out.textContent = 'Pensando…';
+    try { const r = await SAMPLE(prompt, { onText: ({ text }) => { out.textContent = text; }, signal: aiCtl.signal, modelTier: 'default' }); out.textContent = r.text; last.text = r.text; }
+    catch (e) { if (e && e.code === 'not_granted') { SAMPLE = null; out.textContent = 'No se dio permiso para consultar a la IA. Usa «Copiar prompt».'; } else if (e && e.code === 'rate_limited') out.textContent = 'Hay muchas consultas seguidas; espera un momento e inténtalo otra vez.'; else if (e && e.name === 'AbortError' || (e && e.code === 'aborted')) out.textContent = (e.text || '') + '\n(detenido)'; else out.textContent = 'No se pudo completar la consulta. Inténtalo de nuevo o usa «Copiar prompt».'; last.text = (e && e.text) || ''; }
+    finally { stop.hidden = true; }
+  }
+  el.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.ai) { const p = prompts[+b.dataset.ai]; run(p[2](getCer ? getCer() : ''), p[1]); }
+    else if (b.classList.contains('aiFree')) { const v = el.querySelector('.aiQ').value.trim(); if (!v) return toast('Escribe tu consulta.'); run(v, null); }
+    else if (b === stop) { aiCtl && aiCtl.abort(); }
+    else if (b === cp) { if (!(last && last.text)) return toast('Aún no hay respuesta.'); copyText(last.text, out); }
+    else if (b === cpp) { if (last) copyText(last.prompt); }
+    else if (b === useBtn) {
+      if (!(last && last.text)) return toast('Aún no hay respuesta.');
+      const items = last.text.split('\n').map(s => s.replace(/^\s*([-*•]|\d+[.)])\s*/, '').trim()).filter(s => s && !/^#/.test(s));
+      if (last.target === 'questions') { const cer = getCer() || 'C2'; cur.discCustom = (cur.discCustom || []).concat(items.map(q => ({ id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), cer, q }))); renderDisc(); update(); toast(items.length + ' preguntas agregadas a ' + cer); }
+      else { const f = $(last.target), v = f.value.trim(); f.value = (v ? v + '\n' : '') + items.join('\n'); if (last.target.startsWith('i_')) updateInit(); else update(); toast('Agregado a la ficha'); }
+    }
+  });
+}
+
+/* ---------- iniciativa ---------- */
+const INIT_F = [['i_nombre', 'Nombre'], ['i_area', 'Área principal'], ['i_areasExtra', 'Otras áreas'], ['i_sistema', 'Sistema'], ['i_sponsor', 'Sponsors / stakeholders'], ['i_fecha', 'Fecha objetivo'], ['i_problema', 'Problema u oportunidad'], ['i_objetivo', 'Objetivo / OKR'], ['i_hipotesis', 'Hipótesis'], ['i_usuarios', 'Usuarios impactados'], ['i_kpi', 'KPI y línea base'],
+  ['i_alcance', 'Alcance de alto nivel'], ['i_fuera', 'Fuera de alcance'], ['i_riesgos', 'Riesgos y supuestos'], ['i_deps', 'Dependencias'], ['i_epicas', 'Épicas candidatas'], ['i_valor', 'Valor (preliminar)'], ['i_crit', 'Criticidad (preliminar)'], ['i_riesgo', 'Riesgo/Oportunidad (preliminar)'], ['i_talla', 'Tamaño (preliminar)'], ['i_decision', 'Decisión']];
+const INIT_CORE = INIT_F.filter(([k]) => !['i_valor', 'i_crit', 'i_riesgo', 'i_talla', 'i_decision', 'i_areasExtra'].includes(k));
+const DECISIONS = ['En discovery', 'Lista para fichas', 'En pausa', 'Descartada'];
+const INIT_EX = { i_nombre: 'Reducir la mora temprana en 10%', i_area: 'COB', i_sistema: 'Ambos (Factoring Admin y Public)', i_areasExtra: 'RIE,TEC', i_sponsor: 'Gerencia de Cobranzas\nGerencia de Riesgos', i_fecha: '', i_problema: 'La mora a 30 días sube cada cierre de mes y Cobranzas gestiona los recordatorios a mano.', i_objetivo: 'OKR Q1: bajar la mora a 30 días de 6.2% a 5.6%.',
+  i_hipotesis: 'Creemos que recordar el pago antes del vencimiento a los clientes con operaciones activas reducirá la mora temprana. Lo sabremos cuando la mora a 30 días baje 10% en 3 meses.', i_usuarios: 'Clientes con cuotas por vencer; analistas de Cobranzas', i_kpi: 'Mora a 30 días: 6.2% hoy', i_alcance: 'Recordatorios automáticos\nPanel de seguimiento para Cobranzas', i_fuera: 'Cobranza judicial', i_riesgos: 'Costo de SMS mayor al previsto (validar con proveedor)\nClientes con datos de contacto desactualizados (medir rebotes)', i_deps: 'Proveedor de SMS', i_epicas: 'Enviar alertas automáticas de vencimiento\nActualizar datos de contacto de clientes\nMostrar panel de seguimiento de pagos', i_valor: '8', i_crit: '5', i_riesgo: '5', i_talla: 'Large Scale', i_decision: 'En discovery' };
+let initiatives = [], initId = null, pendingInitDel = null;
+function readInit() { const o = {}; for (const [k] of INIT_F) o[k] = $(k).value; return o; }
+function loadInit(i, ex) { for (const [k] of INIT_F) $(k).value = i[k] ?? ''; $('initEx').hidden = !ex; updateInit(); }
+const extrasOf = (t) => String(t.areasExtra || '').split(',').map(x => x.trim()).filter(Boolean);
+function renderPick(boxId, hidId, mainId) {
+  const main = $(mainId).value, sel = String($(hidId).value || '').split(',').filter(c => c && c !== main);
+  $(hidId).value = sel.join(',');
+  $(boxId).innerHTML = AREAS.filter(a => a[0] !== main).map(a => '<button type="button" class="chip" data-pick="' + a[0] + '" data-h="' + hidId + '" data-m="' + mainId + '" data-b="' + boxId + '" aria-pressed="' + sel.includes(a[0]) + '">' + a[0] + ' · ' + esc(a[1]) + '</button>').join('');
+}
+function renderSponsors() { const l = lines($('i_sponsor').value); $('spTags').innerHTML = l.length ? l.map((x, i) => '<span class="tagx">' + esc(x) + '<button type="button" data-spdel="' + i + '" aria-label="Quitar ' + esc(x) + '">×</button></span>').join('') : '<span class="sub" style="margin:0">Aún no hay sponsors.</span>'; }
+function addSponsor() { const v = $('spNew').value.trim(); if (!v) return; const l = lines($('i_sponsor').value); if (!l.includes(v)) l.push(v); $('i_sponsor').value = l.join('\n'); $('spNew').value = ''; updateInit(); $('spNew').focus(); }
+function initCompute(i) { const cod = [i.i_valor, i.i_crit, i.i_riesgo].every(v => +v > 0) ? +i.i_valor + +i.i_crit + +i.i_riesgo : null, tv = tallaVal(i.i_talla); return { cod, wsjf: cod && tv ? Math.round(cod / tv * 10) / 10 : null, fill: INIT_CORE.filter(([k]) => (i[k] || '').trim()).length, total: INIT_CORE.length }; }
+function initText(i, fmt) {
+  const h = (t) => fmt === 'md' ? '## ' + t : fmt === 'wiki' ? 'h2. ' + t : t.toUpperCase(), b = fmt === 'wiki' ? '* ' : '- ', c = initCompute(i), L = [];
+  const sec = (t, v, list) => { if (!v) return; L.push('', h(t)); if (list) lines(v).forEach(x => L.push(b + x)); else L.push(v); };
+  sec('Problema u oportunidad', i.i_problema); sec('Objetivo / OKR', i.i_objetivo); sec('Hipótesis', i.i_hipotesis);
+  L.push('', h('Contexto'), b + 'Área principal: ' + (i.i_area ? areaName(i.i_area) : PD), b + 'Otras áreas: ' + (extrasOf({ areasExtra: i.i_areasExtra }).map(areaName).join(', ') || '—'), b + 'Sistema: ' + (i.i_sistema || PD), b + 'Sponsors: ' + (lines(i.i_sponsor).join('; ') || PD), b + 'Usuarios: ' + (i.i_usuarios || PD), b + 'KPI: ' + (i.i_kpi || PD), b + 'Fecha objetivo: ' + (fmtDate(i.i_fecha) || '—'));
+  sec('Alcance de alto nivel', i.i_alcance, true); sec('Fuera de alcance', i.i_fuera, true); sec('Riesgos y supuestos', i.i_riesgos, true); sec('Dependencias', i.i_deps, true); sec('Épicas candidatas', i.i_epicas, true);
+  L.push('', h('Puntaje preliminar'), b + 'Valor ' + (i.i_valor || '?') + ' · Criticidad ' + (i.i_crit || '?') + ' · Riesgo ' + (i.i_riesgo || '?') + ' · Tamaño ' + (i.i_talla || '?') + (c.wsjf != null ? ' → WSJF preliminar ' + c.wsjf : ''), b + 'Decisión: ' + (i.i_decision || 'En discovery'));
+  return L.join('\n').trim();
+}
+function updateInit() {
+  renderPick('iAreasPick', 'i_areasExtra', 'i_area'); renderSponsors();
+  const i = readInit(), c = initCompute(i), pct = Math.round(c.fill / c.total * 100);
+  $('initMeter').style.width = pct + '%'; $('initPct').textContent = c.fill + ' de ' + c.total + ' campos';
+  $('initW').textContent = c.wsjf ?? '–'; $('initC').textContent = c.cod ?? '–';
+  const nx = i.i_decision === 'Lista para fichas' ? 'Pásala a la ficha: cada épica candidata será un ticket.' : pct < 60 ? 'Sigue el discovery: completa problema, objetivo, hipótesis y KPI con los stakeholders.' : 'Revisa riesgos y épicas con el PO y el Tech Lead, y decide si está lista para fichas.';
+  $('initNext').innerHTML = '<b>Siguiente paso.</b> ' + nx;
+  $('initSum').textContent = 'INI-' + (i.i_area || 'XXX') + ' · ' + (i.i_nombre || 'Sin nombre');
+  $('initDesc').textContent = initText(i, $('fmt').value);
+  $('btnInitSave').textContent = initId ? 'Actualizar iniciativa' : 'Guardar iniciativa';
+}
+function persistLocalInit() { if (MODE !== 'local') return; try { localStorage.setItem('wsjf-inits', JSON.stringify(initiatives)); } catch (e) {} }
+async function saveInit() {
+  const i = readInit(); if (!i.i_nombre.trim()) { toast('Escribe el nombre de la iniciativa.'); $('i_nombre').focus(); return; }
+  const id = initId || ('i-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)); i.updatedAt = new Date().toISOString();
+  try { if (COL) await COL.doc(id).set(i); else { const k = initiatives.findIndex(x => x.id === id); const row = Object.assign({ id }, i); if (k >= 0) initiatives[k] = row; else initiatives.push(row); persistLocalInit(); renderInitList(); }
+    initId = id; $('initEx').hidden = true; updateInit(); toast('Iniciativa guardada'); }
+  catch (e) { toast('No se pudo guardar la iniciativa.'); }
+}
+async function delInit(id) { try { if (COL) await COL.doc(id).delete(); else { initiatives = initiatives.filter(x => x.id !== id); persistLocalInit(); renderInitList(); } if (initId === id) initId = null; toast('Iniciativa eliminada'); } catch (e) { toast('No se pudo eliminar.'); } }
+function renderInitList() {
+  const el = $('initList'); if (!el) return;
+  if (!initiatives.length) { el.innerHTML = '<p class="sub" style="margin:0">Aún no guardas iniciativas. Completa el lienzo y pulsa «Guardar iniciativa».</p>'; return; }
+  el.innerHTML = initiatives.slice().sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')).map(i => { const c = initCompute(i); return '<div class="tk"><div class="row"><b>' + esc(i.i_nombre) + '</b><span class="pill ' + (i.i_decision === 'Lista para fichas' ? 'p-rapida' : i.i_decision === 'Descartada' ? 'p-none' : 'p-agil') + '">' + esc(i.i_decision || 'En discovery') + '</span></div><div class="row"><span class="muted" style="font-size:12px">' + c.fill + '/' + c.total + ' campos · WSJF prel. ' + (c.wsjf ?? '–') + '</span><span>' +
+    (pendingInitDel === i.id ? '<span class="inline-confirm">¿Eliminar? <button class="btn sm danger" data-idelok="' + i.id + '">Sí</button><button class="btn sm" data-idelno="1">No</button></span>' : '<button class="btn sm" data-iopen="' + i.id + '">Abrir</button> <button class="btn sm danger" data-idel="' + i.id + '">Eliminar</button>') + '</span></div></div>'; }).join('');
+}
+function initToTicket() {
+  const i = readInit(), ep = lines(i.i_epicas);
+  editingId = null;
+  load({ tipo: 'HU', area: i.i_area, areasExtra: i.i_areasExtra, corr: i.i_area ? nextCorr(i.i_area) : '', titulo: ep[0] || '', sistema: i.i_sistema, pm: 'Product Manager', estado: 'Entrada', objetivo: i.i_objetivo, problema: i.i_problema, kpi: i.i_kpi, incluye: i.i_alcance, noIncluye: i.i_fuera, deps: i.i_deps, contacto: lines(i.i_sponsor).join(', '), fecha: i.i_fecha,
+    valor: +i.i_valor || '', crit: +i.i_crit || '', riesgo: +i.i_riesgo || '', talla: i.i_talla === 'Large Scale' ? '' : i.i_talla, tagsExtra: i.i_nombre ? 'ini-' + i.i_nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) : '' }, false);
+  showTab('nuevo'); toast(ep.length > 1 ? 'Ficha creada con la primera épica; repite para las otras ' + (ep.length - 1) : 'Ficha creada desde la iniciativa');
+}
+
+/* ---------- notas ---------- */
+let notes = [], noteId = null, noteTimer = null, pendingNoteDel = false;
+function persistLocalNotes() { if (MODE !== 'local') return; try { localStorage.setItem('wsjf-notes', JSON.stringify(notes)); } catch (e) {} }
+function renderNotes() {
+  const q = $('noteQ').value.toLowerCase();
+  const list = notes.slice().sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')).filter(n => !q || ((n.title || '') + ' ' + (n.body || '')).toLowerCase().includes(q));
+  $('noteList').innerHTML = list.length ? list.map(n => '<button type="button" class="nitem' + (n.id === noteId ? ' on' : '') + '" data-note="' + n.id + '"><b>' + esc(n.title || 'Sin título') + '</b><small>' + esc((n.body || '').slice(0, 70)) + '</small><em>' + (n.updatedAt ? new Date(n.updatedAt).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }) : '') + '</em></button>').join('') : '<p class="sub" style="margin:0">' + (notes.length ? 'Ninguna nota coincide.' : 'Aún no tienes notas. Pulsa «Nueva nota».') + '</p>';
+  const n = notes.find(x => x.id === noteId);
+  $('noteEditor').hidden = !n; $('noteEmpty').hidden = !!n;
+  if (n && document.activeElement !== $('noteTitle') && document.activeElement !== $('noteBody')) { $('noteTitle').value = n.title || ''; $('noteBody').value = n.body || ''; }
+  $('noteDelWrap').innerHTML = pendingNoteDel ? '<span class="inline-confirm">¿Eliminar esta nota? <button type="button" class="btn sm danger" id="noteDelOk">Sí</button><button type="button" class="btn sm" id="noteDelNo">No</button></span>' : '<button type="button" class="btn sm danger" id="noteDel">Eliminar</button>';
+}
+async function writeNote(n) {
+  $('noteState').textContent = 'Guardando…';
+  try { const d = { title: n.title, body: n.body, ticket: n.ticket || '', updatedAt: n.updatedAt }; if (COL) await COL.doc(n.id).set(d); else persistLocalNotes(); $('noteState').textContent = 'Guardado'; }
+  catch (e) { $('noteState').textContent = 'No se pudo guardar'; }
+}
+function noteChanged() {
+  const n = notes.find(x => x.id === noteId); if (!n) return;
+  n.title = $('noteTitle').value; n.body = $('noteBody').value; n.updatedAt = new Date().toISOString();
+  $('noteState').textContent = 'Sin guardar…'; clearTimeout(noteTimer); noteTimer = setTimeout(() => writeNote(n), 1200); renderNotes();
+}
+function newNote(body) {
+  const n = { id: 'n-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), title: body ? 'Notas de ' + codeOf(cur) : 'Nueva nota', body: body || '', ticket: body ? codeOf(cur) : '', updatedAt: new Date().toISOString() };
+  notes.push(n); noteId = n.id; pendingNoteDel = false; renderNotes(); $('noteTitle').value = n.title; $('noteBody').value = n.body; writeNote(n); $('noteBody').focus();
+}
+
+/* ---------- historial de versiones ---------- */
+const HIST_MAX = 15;
+const stripHist = (t) => { const o = Object.assign({}, t); delete o.history; delete o.id; return o; };
+function renderHistory(id) {
+  const t = tickets.find(x => x.id === id), el = $('histWrap');
+  if (!t) { el.hidden = true; return; }
+  const h = (t.history || []).slice().reverse();
+  el.hidden = false;
+  el.innerHTML = '<div class="toolbar"><h2 style="margin:0">Historial de ' + esc(codeOf(t)) + '</h2><button type="button" class="btn sm" data-hclose="1">Cerrar</button></div>' +
+    '<p class="sub">Versión actual' + (t.versionLabel ? ' («' + esc(t.versionLabel) + '»' + (t.versionNote ? ': ' + esc(t.versionNote) : '') + ')' : '') + ' guardada el ' + new Date(t.updatedAt).toLocaleString('es-PE') + ' · WSJF ' + (compute(t).wsjf ?? '–') + ' · ' + esc(t.estado || '') + '</p>' +
+    (h.length ? '<table><thead><tr><th>Guardado</th><th>Reunión / versión</th><th>Título</th><th class="num">WSJF</th><th>Tamaño</th><th>Estado</th><th></th></tr></thead><tbody>' + h.map((v, i) => { const d = v.data || {}; return '<tr><td>' + (v.at ? new Date(v.at).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }) : '—') + '</td><td>' + (d.versionLabel ? '<b>' + esc(d.versionLabel) + '</b>' + (d.versionNote ? '<br><small class="muted">' + esc(d.versionNote) + '</small>' : '') : '<span class="muted">Edición</span>') + '</td><td>' + esc(d.titulo) + '</td><td class="num">' + (compute(d).wsjf ?? '–') + '</td><td>' + esc(d.talla || PD) + '</td><td>' + esc(d.estado || '') + '</td><td><button type="button" class="btn sm" data-hrest="' + id + '" data-hi="' + (h.length - 1 - i) + '">Abrir en la ficha</button></td></tr>'; }).join('') + '</tbody></table>'
+      : '<p class="sub">Aún no hay versiones anteriores. Cada vez que actualices el ticket se guardará la versión previa (hasta ' + HIST_MAX + ').</p>');
+  const ac = (t.actas || []).slice().reverse();
+  if (ac.length) el.innerHTML += '<h3 style="font-size:14px;margin:16px 0 6px">Actas de reunión</h3><table><thead><tr><th>Fecha</th><th>Reunión</th><th>Asunto</th><th></th></tr></thead><tbody>' + ac.map((a, i) => '<tr><td>' + new Date(a.at).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }) + '</td><td>' + esc(a.reunion) + '</td><td>' + esc(a.asunto) + '</td><td style="white-space:nowrap"><button type="button" class="btn sm" data-acta="' + id + '" data-ai2="' + (ac.length - 1 - i) + '">Copiar acta</button></td></tr>').join('') + '</tbody></table>';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ---------- respaldo JSON ---------- */
+function backupJSON() { const strip = (a) => a.map(x => Object.assign({}, x)); return JSON.stringify({ app: 'generador-wsjf', version: 1, exportedAt: new Date().toISOString(), tickets: strip(tickets), initiatives: strip(initiatives), notes: strip(notes) }, null, 2); }
+async function importJSON(text) {
+  let d; try { d = JSON.parse(text); } catch (e) { toast('El archivo no es un respaldo válido.'); return; }
+  const items = [].concat(d.tickets || [], d.initiatives || [], d.notes || []).filter(x => x && x.id);
+  if (!items.length) { toast('El respaldo no tiene datos.'); return; }
+  let n = 0;
+  for (const it of items) {
+    const body = Object.assign({}, it); delete body.id;
+    try {
+      if (COL) await COL.doc(it.id).set(body);
+      else { const arr = it.id[0] === 't' ? tickets : it.id[0] === 'i' ? initiatives : notes; const k = arr.findIndex(x => x.id === it.id); if (k >= 0) arr[k] = it; else arr.push(it); }
+      n++;
+    } catch (e) {}
+  }
+  if (!COL) { persistLocal(); persistLocalInit(); persistLocalNotes(); renderBacklog(); renderInitList(); renderNotes(); }
+  toast(n + ' registros importados');
+}
+
+/* ---------- Supabase (solo en la versión publicada en tu propio hosting) ---------- */
+let SB = null, SB_USER = null;
+function sbCollection(client, uid) {
+  const listeners = []; let rows = [];
+  const kindOf = (id) => id[0] === 't' ? 'ticket' : id[0] === 'i' ? 'initiative' : 'note';
+  async function refresh() {
+    const { data, error } = await client.from('wsjf_items').select('id,data').order('updated_at', { ascending: true });
+    if (error) throw error; rows = data || [];
+    const snap = { docs: rows.map(r => ({ id: r.id, data: () => r.data })) };
+    listeners.forEach(f => f(snap));
+  }
+  return {
+    doc(id) { return {
+      async set(d) { const { error } = await client.from('wsjf_items').upsert({ user_id: uid, id, kind: kindOf(id), data: d, updated_at: new Date().toISOString() }, { onConflict: 'user_id,id' }); if (error) throw error; await refresh(); },
+      async update(p) { const r = rows.find(x => x.id === id); return this.set(Object.assign({}, r ? r.data : {}, p)); },
+      async delete() { const { error } = await client.from('wsjf_items').delete().eq('id', id); if (error) throw error; await refresh(); },
+    }; },
+    onSnapshot(next, err) { listeners.push(next); refresh().catch(e => err && err(e)); return () => {}; },
+  };
+}
+function sbConfig() { try { return JSON.parse(localStorage.getItem('wsjf-sb') || 'null'); } catch (e) { return null; } }
+function loadScript(src) { return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+function showLogin(step, msg) {
+  $('login').hidden = false;
+  for (const s of ['lgChoice', 'lgCfg', 'lgMail', 'lgCode']) $(s).hidden = s !== step;
+  $('lgMsg').textContent = msg || '';
+}
+async function startSupabase() {
+  const cfg = sbConfig();
+  if (!cfg || !cfg.url || !cfg.key) { showLogin('lgCfg'); return false; }
+  try { if (!window.supabase) await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js'); }
+  catch (e) { showLogin('lgCfg', 'No se pudo cargar la librería de Supabase. Revisa tu conexión.'); return false; }
+  SB = window.supabase.createClient(cfg.url, cfg.key);
+  const { data } = await SB.auth.getSession();
+  if (data && data.session) { await onSbSession(data.session); return true; }
+  showLogin('lgMail'); return false;
+}
+function useMemory() {
+  $('login').hidden = true; COL = null;
+  setStatus('memory', 'Sin guardar: los datos se pierden al cerrar');
+  $('btnLogin').hidden = false;
+  $('storeInfo').textContent = 'Estás usando la herramienta sin guardar. Para conservar tu trabajo, pulsa «Empezar a guardar» o descarga un respaldo JSON antes de cerrar.';
+  renderBacklog(); renderInitList(); renderNotes(); update();
+}
+async function onSbSession(session) {
+  const pendiente = (!COL && (tickets.length || initiatives.length || notes.length)) ? backupJSON() : null;
+  SB_USER = session.user; $('login').hidden = true; $('btnLogin').hidden = true;
+  COL = sbCollection(SB, SB_USER.id);
+  if (pendiente) { await importJSON(pendiente); toast('Se guardó en Supabase lo que hiciste sin sesión'); }
+  setStatus('db', 'Sesión: ' + SB_USER.email + ' · Supabase');
+  $('btnLogout').hidden = false;
+  attachSnapshot();
+}
+
+/* ---------- eventos ---------- */
+function showTab(name) {
+  document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+  for (const p of ['nuevo', 'disc', 'backlog', 'sim', 'guia', 'init', 'notas']) $('p-' + p).hidden = p !== name;
+  if (name === 'backlog') renderBacklog(); if (name === 'sim') simulate(); if (name === 'disc') { renderDisc(); renderDiscCtx(); } if (name === 'init') renderInitList(); if (name === 'notas') renderNotes();
+  try { localStorage.setItem('wsjf-tab', name); } catch (e) {}
+}
+document.querySelector('nav.tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showTab(b.dataset.tab); });
+$('f').addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.l) { cur[el.dataset.l][+el.dataset.i][el.dataset.k] = el.value; update(); return; }
+  if (el.dataset.sd) { cur.sdlc = cur.sdlc || {}; cur.sdlc[el.dataset.sd] = Object.assign({}, cur.sdlc[el.dataset.sd], { [el.dataset.k]: el.value }); if (el.dataset.k === 'estado') { const row = el.closest('.sdrow'); row.classList.toggle('ok', el.value === 'Listo'); row.classList.toggle('na', el.value === 'No aplica'); } sdlcProgress(); update(); return; }
+  if (el.id === 'area' && !editingId && el.value) $('corr').value = nextCorr(el.value);
+  if (el.id === 'corr') $('corr').value = $('corr').value.replace(/\D/g, '');
+  update();
+});
+$('f').addEventListener('change', e => { if (e.target.dataset.sd) return; if (e.target.dataset.l) { cur[e.target.dataset.l][+e.target.dataset.i][e.target.dataset.k] = e.target.value; } update(); });
+$('f').addEventListener('submit', e => e.preventDefault());
+$('f').addEventListener('click', e => {
+  const rm = e.target.closest('button[data-rm]'); if (rm) { cur[rm.dataset.rm].splice(+rm.dataset.i, 1); renderList(rm.dataset.rm); update(); return; }
+  const nf = e.target.closest('button[data-nf]'); if (nf) { const v = $('nfTl').value.trim(); if (!lines(v).includes(nf.dataset.nf)) $('nfTl').value = (v ? v + '\n' : '') + nf.dataset.nf; update(); }
+});
+for (const [btn, name] of [['addAnexo', 'anexos'], ['addVideo', 'videos'], ['addTag', 'tagsNew']]) $(btn).addEventListener('click', () => { (cur[name] = cur[name] || []).push(Object.assign({}, LISTS[name].blank)); renderList(name); update(); const first = $(name).querySelector('.rowx:last-child input, .rowx:last-child select'); if (first) first.focus(); });
+$('tallas').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setTalla(b.dataset.t); update(); });
+$('fmt').addEventListener('change', () => { update(); updateInit(); try { localStorage.setItem('wsjf-fmt', $('fmt').value); } catch (e) {} });
+$('cpSum').addEventListener('click', () => copyText($('outSum').textContent, $('outSum')));
+$('cpDesc').addEventListener('click', () => copyText($('outDesc').textContent, $('outDesc')));
+$('btnSave').addEventListener('click', saveTicket);
+$('btnTxt').addEventListener('click', () => { readForm(); save(fname(codeOf(cur)) + '.txt', summaryOf(cur) + '\n\n' + render(cur, $('fmt').value)); });
+$('btnDocx').addEventListener('click', async () => { readForm(); try { save(fname(codeOf(cur)) + '.docx', await makeDocx([JSON.parse(JSON.stringify(cur))])); } catch (e) { toast('No se pudo generar el Word. Usa el .txt.'); } });
+$('btnNew').addEventListener('click', () => { editingId = null; load({ pm: 'Product Manager', estado: 'Entrada', corr: '' }, false); $('titulo').focus(); });
+$('q').addEventListener('input', renderBacklog); $('fVia').addEventListener('change', renderBacklog); $('fEstado').addEventListener('change', renderBacklog);
+$('blWrap').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.edit) { const t = tickets.find(x => x.id === b.dataset.edit); if (t) { editingId = t.id; load(t, false); showTab('nuevo'); toast('Editando ' + codeOf(t)); } }
+  else if (b.dataset.hist) { renderHistory(b.dataset.hist); }
+  else if (b.dataset.copy) { const t = tickets.find(x => x.id === b.dataset.copy); if (t) copyText(summaryOf(t) + '\n\n' + render(t, $('fmt').value)); }
+  else if (b.dataset.del) { pendingDel = b.dataset.del; renderBacklog(); }
+  else if (b.dataset.delok) { const id = b.dataset.delok; pendingDel = null; delTicket(id); }
+  else if (b.dataset.delno) { pendingDel = null; renderBacklog(); }
+});
+$('blWrap').addEventListener('change', e => { const s = e.target.closest('select[data-est]'); if (s) setEstado(s.dataset.est, s.value); });
+const orderedList = () => ranked(tickets).map(x => x.t);
+$('expTxt').addEventListener('click', () => { if (!tickets.length) return toast('El backlog está vacío.'); save('backlog_wsjf.txt', orderedList().map(t => summaryOf(t) + '\n\n' + render(t, $('fmt').value)).join('\n\n' + '-'.repeat(60) + '\n\n')); });
+$('expDocx').addEventListener('click', async () => { if (!tickets.length) return toast('El backlog está vacío.'); try { save('backlog_wsjf.docx', await makeDocx(orderedList(), 'Backlog priorizado por WSJF')); } catch (e) { toast('No se pudo generar el Word.'); } });
+$('expCsv').addEventListener('click', () => { if (!tickets.length) return toast('El backlog está vacío.'); save('backlog_jira.csv', '﻿' + csv(orderedList())); });
+for (const id of ['sSrc', 'sUmb', 'sCup']) $(id).addEventListener('input', () => { if (id === 'sUmb') { UMBRAL = +$('sUmb').value; try { localStorage.setItem('wsjf-umbral', UMBRAL); } catch (e) {} update(); } simulate(); });
+
+/* ---------- arranque ---------- */
+fill();
+$('sUmb').value = UMBRAL; $('sCup').value = 3;
+try { const f = localStorage.getItem('wsjf-fmt'); if (f) $('fmt').value = f; } catch (e) {}
+load(EXAMPLE, true);
+try { const tb = localStorage.getItem('wsjf-tab'); if (tb) showTab(tb); } catch (e) {}
+/* ---------- eventos: discovery, iniciativa, notas, historial, login ---------- */
+$('discCer').addEventListener('change', () => { renderDisc(); if ($('discCer').value) $('newQCer').value = $('discCer').value; });
+$('discQ').addEventListener('input', e => { const el = e.target; const id = el.dataset.qa; if (!id) return; cur.disc = cur.disc || {}; cur.disc[id] = Object.assign({}, cur.disc[id], { ans: el.value }); if (el.value && !cur.disc[id].ok) { cur.disc[id].ok = true; const cb = $('qc-' + id); if (cb) { cb.checked = true; cb.closest('.q').classList.add('done'); } } update(); });
+$('discQ').addEventListener('change', e => { const el = e.target; const id = el.dataset.q; if (!id) return; cur.disc = cur.disc || {}; cur.disc[id] = Object.assign({}, cur.disc[id], { ok: el.checked }); el.closest('.q').classList.toggle('done', el.checked); renderDisc(); update(); });
+$('discQ').addEventListener('click', e => { const b = e.target.closest('button[data-qdel]'); if (!b) return; cur.discCustom = (cur.discCustom || []).filter(x => x.id !== b.dataset.qdel); if (cur.disc) delete cur.disc[b.dataset.qdel]; renderDisc(); update(); });
+$('addQ').addEventListener('click', () => { const q = $('newQ').value.trim(); if (!q) return toast('Escribe la pregunta.'); cur.discCustom = (cur.discCustom || []).concat([{ id: 'c' + Date.now().toString(36), cer: $('newQCer').value, q }]); $('newQ').value = ''; renderDisc(); update(); toast('Pregunta agregada'); });
+$('designList').addEventListener('change', e => { const id = e.target.dataset.d; if (!id) return; cur.design = Object.assign({}, cur.design, { [id]: e.target.checked }); renderDisc(); update(); });
+aiBox('aiTicket', AI_TICKET, ticketCtx, () => $('discCer').value || '');
+aiBox('aiInit', AI_INIT, initCtx, () => '');
+
+$('snapCer').innerHTML = CEREMONIAS.concat(['Otra reunión']).map(c => opt(c)).join('');
+$('btnSnap').addEventListener('click', () => { const p = $('snapPanel'); p.hidden = !p.hidden; if (!p.hidden) { const f = $('discCer').value, m = f && CEREMONIAS.find(c => c.startsWith(f)); if (m) $('snapCer').value = m; $('snapNote').focus(); } });
+const snapTicket = () => { readForm(); return Object.assign(JSON.parse(JSON.stringify(cur)), { versionLabel: $('snapCer').value, versionNote: $('snapNote').value.trim(), versionAt: new Date().toISOString() }); };
+$('snapGo').addEventListener('click', async () => { const t = snapTicket(); copyText(summaryOf(t) + '\n\n' + render(t, $('fmt').value)); const ok = await saveTicket({ label: t.versionLabel, note: t.versionNote }); if (ok) { $('snapPanel').hidden = true; $('snapNote').value = ''; toast('Versión «' + t.versionLabel + '» guardada y texto completo copiado'); } });
+$('snapDocx').addEventListener('click', async () => { const t = snapTicket(); try { save(fname(codeOf(t) + '_' + t.versionLabel.split(' ')[0] + '_' + t.versionAt.slice(0, 10)) + '.docx', await makeDocx([t])); } catch (e) { toast('No se pudo generar el Word.'); } });
+$('snapCancel').addEventListener('click', () => { $('snapPanel').hidden = true; });
+const DIFF_F = [['titulo', 'Título'], ['sistema', 'Sistema'], ['modulos', 'Módulos'], ['incluye', 'Alcance · incluye', 1], ['noIncluye', 'Alcance · no incluye', 1], ['reglas', 'Reglas de negocio', 1], ['criterios', 'Criterios funcionales', 1], ['nfTl', 'No funcionales (Tech Lead)', 1], ['valor', 'Valor de negocio'], ['crit', 'Criticidad temporal'], ['riesgo', 'Riesgo / Oportunidad'], ['talla', 'Tamaño'], ['clase', 'Clase de servicio'], ['urgencia', 'Urgencia'], ['fecha', 'Fecha límite'], ['estado', 'Estado']];
+function diffTickets(a, b) {
+  if (!a) return { first: true, list: [], scope: false };
+  const out = []; let scope = false;
+  for (const [k, l, multi] of DIFF_F) {
+    const va = a[k] ?? '', vb = b[k] ?? '';
+    if (String(va).trim() === String(vb).trim()) continue;
+    if (multi) { const A = lines(va), Bl = lines(vb), add = Bl.filter(x => !A.includes(x)), rem = A.filter(x => !Bl.includes(x)); if (!add.length && !rem.length) continue;
+      if (k === 'incluye' || k === 'noIncluye') scope = true;
+      out.push(l + ': ' + [add.length ? 'se agrega «' + add.join('», «') + '»' : '', rem.length ? 'se quita «' + rem.join('», «') + '»' : ''].filter(Boolean).join('; ')); }
+    else out.push(l + ': ' + (va === '' ? PD : (k === 'fecha' ? fmtDate(va) : va)) + ' → ' + (vb === '' ? PD : (k === 'fecha' ? fmtDate(vb) : vb)));
+  }
+  for (const [id, n] of SDLC) { const ea = ((a.sdlc || {})[id] || {}).estado || 'Pendiente', eb = ((b.sdlc || {})[id] || {}).estado || 'Pendiente'; if (ea !== eb) out.push('SDLC · ' + n + ': ' + ea + ' → ' + eb); }
+  const wa = compute(a).wsjf, wb = compute(b).wsjf; if (wa !== wb) out.push('WSJF: ' + (wa ?? PD) + ' → ' + (wb ?? PD));
+  return { first: false, list: out, scope };
+}
+function buildActa() {
+  const t = snapTicket(), c = compute(t), prev = tickets.find(x => x.id === editingId), d = diffTickets(prev, t);
+  const reunion = t.versionLabel, short = reunion.split(' ')[0], hoy = new Date().toLocaleDateString('es-PE');
+  const acuerdos = discQuestions(t).filter(x => ((t.disc || {})[x.id] || {}).ans && (!CER_SHORT.includes(short) || x.cer === short)).map(x => x.q + ' → ' + t.disc[x.id].ans).concat(lines($('actaAcu').value));
+  const pend = lines($('actaPend').value).map(x => { const [tarea, resp, fec] = x.split('|').map(y => (y || '').trim()); return tarea + (resp ? ' — Responsable: ' + resp : '') + (fec ? ' — Fecha: ' + fec : ''); });
+  let alc = $('actaAlc').value; const auto = d.scope && alc === 'No';
+  const vid = (t.videos || []).find(v => v.url && (v.ceremonia || '').startsWith(short));
+  const L = ['Hola a todos:', '', 'Comparto el acta de la reunión «' + reunion + '» del ticket ' + summaryOf(t) + ', realizada el ' + hoy + '.', ''];
+  if ($('actaAsis').value.trim()) L.push('Asistentes: ' + $('actaAsis').value.trim(), '');
+  L.push('1. Resumen', '- Objetivo: ' + (t.objetivo || PD), '- Estado: ' + (t.estado || PD) + ' · Vía: ' + (c.via || 'pendiente de triaje') + ' · WSJF: ' + (c.wsjf ?? PD) + (c.cod ? ' (CoD ' + c.cod + ' ÷ ' + (t.talla || '?') + ')' : ''));
+  if (t.versionNote) L.push('- Nota: ' + t.versionNote);
+  L.push('', '2. Acuerdos'); (acuerdos.length ? acuerdos : ['Sin acuerdos registrados']).forEach(x => L.push('- ' + x));
+  L.push('', '3. Cambio de alcance: ' + (auto ? 'Sí (se detectaron cambios en el alcance respecto de la versión anterior)' : alc));
+  if (alc !== 'No' || auto) { if ($('actaAlcDet').value.trim()) L.push('- Detalle e impacto: ' + $('actaAlcDet').value.trim()); L.push('- Aprobado por: ' + ($('actaApr').value.trim() || 'pendiente de aprobación')); }
+  L.push('', '4. Cambios desde la versión anterior'); if (d.first) L.push('- Primera versión del ticket.'); else (d.list.length ? d.list : ['Sin cambios en los campos principales']).forEach(x => L.push('- ' + x));
+  L.push('', '5. Pendientes'); (pend.length ? pend : ['Sin pendientes']).forEach(x => L.push('- ' + x));
+  L.push('', '6. Siguiente paso', '- ' + NEXT[c.via].replace(/<[^>]+>/g, ''));
+  const links = [t.figma && 'Figma: ' + t.figma, t.prototipo && 'Prototipo: ' + t.prototipo, vid && 'Grabación de la reunión: ' + vid.url].filter(Boolean);
+  if (links.length) { L.push('', 'Enlaces'); links.forEach(x => L.push('- ' + x)); }
+  L.push('', 'Si algo no refleja lo conversado, respondan este correo antes del ' + new Date(Date.now() + 2 * 864e5).toLocaleDateString('es-PE') + '.', '', 'Saludos,', t.pm || 'Product Manager');
+  return { t, reunion, asunto: 'Acta ' + reunion + ' · ' + summaryOf(t) + ' · ' + hoy, cuerpo: L.join('\n'), at: new Date().toISOString(), cambioAlcance: auto ? 'Detectado' : alc };
+}
+let lastActa = null;
+$('actaAlc').addEventListener('change', () => { $('actaDetWrap').style.opacity = $('actaAlc').value === 'No' ? '.6' : '1'; });
+$('btnActa').addEventListener('click', async () => {
+  const a = buildActa(); lastActa = a;
+  $('actaSub').textContent = a.asunto; $('actaBody').textContent = a.cuerpo; $('actaOut').hidden = false;
+  copyText(a.asunto + '\n\n' + a.cuerpo, $('actaBody'));
+  const ok = await saveTicket({ label: a.t.versionLabel, note: a.t.versionNote, acta: { at: a.at, reunion: a.reunion, asunto: a.asunto, cuerpo: a.cuerpo, cambioAlcance: a.cambioAlcance } });
+  if (ok) toast('Acta generada, copiada y guardada con la versión «' + a.reunion + '»');
+});
+$('cpActaSub').addEventListener('click', () => copyText($('actaSub').textContent, $('actaSub')));
+$('cpActaBody').addEventListener('click', () => copyText($('actaBody').textContent, $('actaBody')));
+$('actaTxt').addEventListener('click', () => { if (lastActa) save(fname('Acta_' + codeOf(lastActa.t) + '_' + lastActa.reunion.split(' ')[0] + '_' + lastActa.at.slice(0, 10)) + '.txt', 'Asunto: ' + lastActa.asunto + '\n\n' + lastActa.cuerpo); });
+$('actaDocx').addEventListener('click', async () => { if (!lastActa) return; try {
+  const zip = new JSZip(); const body = para(run(lastActa.asunto, { b: true, sz: 26, color: '0B7A74' }), { after: 200 }) + lastActa.cuerpo.split('\n').map(x => /^\d\. /.test(x) ? para(run(x, { b: true, sz: 22 }), { before: 160, after: 60 }) : para(run(x), { after: x ? 40 : 80 })).join('');
+  zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+  zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+  zip.file('word/document.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body + '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>');
+  save(fname('Acta_' + codeOf(lastActa.t) + '_' + lastActa.reunion.split(' ')[0] + '_' + lastActa.at.slice(0, 10)) + '.docx', await zip.generateAsync({ type: 'blob' }));
+} catch (e) { toast('No se pudo generar el Word del acta.'); } });
+$('fi').addEventListener('input', updateInit);
+document.addEventListener('click', e => { const b = e.target.closest('button[data-pick]'); if (!b) return; const h = $(b.dataset.h); let sel = h.value.split(',').filter(Boolean); sel = sel.includes(b.dataset.pick) ? sel.filter(x => x !== b.dataset.pick) : sel.concat(b.dataset.pick); h.value = sel.join(','); if (b.dataset.h === 'areasExtra') update(); else updateInit(); });
+$('spAdd').addEventListener('click', addSponsor);
+$('spNew').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addSponsor(); } });
+$('spTags').addEventListener('click', e => { const b = e.target.closest('button[data-spdel]'); if (!b) return; const l = lines($('i_sponsor').value); l.splice(+b.dataset.spdel, 1); $('i_sponsor').value = l.join('\n'); updateInit(); }); $('fi').addEventListener('change', updateInit); $('fi').addEventListener('submit', e => e.preventDefault());
+$('btnInitSave').addEventListener('click', saveInit);
+$('btnInitTicket').addEventListener('click', initToTicket);
+$('btnInitNew').addEventListener('click', () => { initId = null; loadInit({ i_decision: 'En discovery' }, false); $('i_nombre').focus(); });
+$('cpInitSum').addEventListener('click', () => copyText($('initSum').textContent, $('initSum')));
+$('cpInitDesc').addEventListener('click', () => copyText($('initDesc').textContent, $('initDesc')));
+$('initList').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.iopen) { const i = initiatives.find(x => x.id === b.dataset.iopen); if (i) { initId = i.id; loadInit(i, false); toast('Iniciativa abierta'); } }
+  else if (b.dataset.idel) { pendingInitDel = b.dataset.idel; renderInitList(); }
+  else if (b.dataset.idelok) { const id = b.dataset.idelok; pendingInitDel = null; delInit(id); }
+  else if (b.dataset.idelno) { pendingInitDel = null; renderInitList(); } });
+
+$('noteNew').addEventListener('click', () => newNote(''));
+$('noteFromTicket').addEventListener('click', () => newNote(summaryOf(cur) + '\n\n'));
+$('noteQ').addEventListener('input', renderNotes);
+$('noteList').addEventListener('click', e => { const b = e.target.closest('button[data-note]'); if (!b) return; noteId = b.dataset.note; pendingNoteDel = false; const n = notes.find(x => x.id === noteId); $('noteTitle').value = n.title || ''; $('noteBody').value = n.body || ''; renderNotes(); });
+$('noteTitle').addEventListener('input', noteChanged); $('noteBody').addEventListener('input', noteChanged);
+$('noteCopy').addEventListener('click', () => copyText($('noteBody').value, $('noteBody')));
+$('noteDelWrap').addEventListener('click', async e => { const b = e.target.closest('button'); if (!b) return;
+  if (b.id === 'noteDel') { pendingNoteDel = true; renderNotes(); }
+  else if (b.id === 'noteDelNo') { pendingNoteDel = false; renderNotes(); }
+  else if (b.id === 'noteDelOk') { const id = noteId; pendingNoteDel = false; noteId = null; clearTimeout(noteTimer); try { if (COL) await COL.doc(id).delete(); notes = notes.filter(x => x.id !== id); persistLocalNotes(); } catch (er) { toast('No se pudo eliminar.'); } renderNotes(); } });
+$('bkExport').addEventListener('click', () => save('respaldo_wsjf_' + new Date().toISOString().slice(0, 10) + '.json', backupJSON()));
+$('bkFile').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => importJSON(String(r.result)); r.readAsText(f); e.target.value = ''; });
+
+$('histWrap').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.hclose) $('histWrap').hidden = true;
+  else if (b.dataset.acta) { const t = tickets.find(x => x.id === b.dataset.acta), a = t && (t.actas || [])[+b.dataset.ai2]; if (a) copyText('Asunto: ' + a.asunto + '\n\n' + a.cuerpo); }
+  else if (b.dataset.hrest) { const t = tickets.find(x => x.id === b.dataset.hrest), v = t && (t.history || [])[+b.dataset.hi]; if (v) { editingId = t.id; load(Object.assign({}, v.data), false); showTab('nuevo'); toast('Versión anterior abierta en la ficha. Pulsa «Actualizar» para restaurarla.'); } } });
+
+$('lgCfg').addEventListener('submit', e => { e.preventDefault(); try { localStorage.setItem('wsjf-sb', JSON.stringify({ url: $('sbUrl').value.trim().replace(/\/$/, ''), key: $('sbKey').value.trim() })); } catch (er) {} startSupabase(); });
+$('lgLocal').addEventListener('click', useMemory);
+$('lgSkip').addEventListener('click', useMemory);
+$('btnLogin').addEventListener('click', () => { if (VDB) enterSaved(); else if (SB) showLogin('lgMail'); else startSupabase(); });
+$('lgSaveClaude').addEventListener('click', enterSaved);
+$('lgTempClaude').addEventListener('click', useMemory);
+window.addEventListener('beforeunload', e => { if (MODE === 'memory' && !COL && (tickets.length || initiatives.length || notes.length)) { e.preventDefault(); e.returnValue = ''; } });
+$('lgReset').addEventListener('click', () => { try { localStorage.removeItem('wsjf-sb'); } catch (er) {} showLogin('lgCfg'); });
+$('lgMail').addEventListener('submit', async e => { e.preventDefault(); const email = $('lgEmail').value.trim(); $('lgMsg').textContent = 'Enviando…';
+  const { error } = await SB.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  if (error) showLogin('lgMail', 'No se pudo enviar el código: ' + error.message); else showLogin('lgCode', ''); });
+$('lgCode').addEventListener('submit', async e => { e.preventDefault(); $('lgMsg').textContent = 'Verificando…';
+  const { data, error } = await SB.auth.verifyOtp({ email: $('lgEmail').value.trim(), token: $('lgPin').value.trim(), type: 'email' });
+  if (error || !data.session) showLogin('lgCode', 'El código no es válido o venció. Pide uno nuevo.'); else onSbSession(data.session); });
+$('lgBack').addEventListener('click', () => showLogin('lgMail'));
+$('btnLogout').addEventListener('click', async () => { if (SB) await SB.auth.signOut(); location.reload(); });
+
+loadInit(INIT_EX, true);
+renderNotes();
+(async () => {
+  const inViewer = !!(window.claude && window.claude.use);
+  if (inViewer) {
+    const [db, user, dl, sm] = await Promise.all([window.claude.use('db'), window.claude.use('user'), window.claude.use('downloads'), window.claude.use('sample')]);
+    DL = dl; SAMPLE = sm;
+    if (!dl) for (const id of ['btnDocx', 'btnTxt', 'expDocx', 'expTxt', 'expCsv', 'bkExport']) $(id).hidden = true;
+    const uid = user ? await user.id() : null;
+    if (db && uid) { VDB = { db, uid }; showLogin('lgChoice'); }
+    else useLocal();
+  } else {
+    DL = { save: async ({ filename, data }) => { const a = document.createElement('a'); a.href = URL.createObjectURL(data instanceof Blob ? data : new Blob([data])); a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); return { status: 'saved' }; } };
+    $('storeInfo').textContent = 'Versión publicada en tu hosting: con Supabase, cada PM inicia sesión con su correo y un código PIN, y cada guardado queda en el historial de la base de datos.';
+    const ok = await startSupabase(); if (!ok && $('login').hidden) useLocal();
+  }
+})();
+let VDB = null;
+async function enterSaved() {
+  const pendiente = (!COL && (tickets.length || initiatives.length || notes.length)) ? backupJSON() : null;
+  $('login').hidden = true; $('btnLogin').hidden = true;
+  COL = VDB.db.collection('data/users/' + VDB.uid);
+  setStatus('db', 'Datos guardados en tu cuenta de Claude');
+  $('storeInfo').textContent = 'Estás guardando en tu cuenta de Claude: tus tickets, iniciativas, notas y actas quedan guardados y solo tú los ves. Cada ticket conserva sus últimas ' + HIST_MAX + ' versiones.';
+  if (pendiente) { await importJSON(pendiente); toast('Se guardó lo que hiciste sin guardar'); }
+  attachSnapshot();
+}
+function useLocal() {
+  try { tickets = JSON.parse(localStorage.getItem('wsjf-backlog') || '[]'); initiatives = JSON.parse(localStorage.getItem('wsjf-inits') || '[]'); notes = JSON.parse(localStorage.getItem('wsjf-notes') || '[]'); setStatus('local', 'Datos guardados solo en este navegador'); }
+  catch (e) { setStatus('memory', 'Sin guardado: exporta antes de cerrar'); }
+  if (!$('storeInfo').textContent) $('storeInfo').textContent = 'Tus datos se guardan solo en este navegador. Descarga respaldos con frecuencia.';
+  renderBacklog(); renderInitList(); renderNotes(); update();
+}
+function attachSnapshot() {
+  COL.onSnapshot(snap => {
+    const all = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    tickets = all.filter(d => d.id.startsWith('t-')); initiatives = all.filter(d => d.id.startsWith('i-'));
+    const fresh = all.filter(d => d.id.startsWith('n-')); notes = fresh.map(n => n.id === noteId ? (notes.find(x => x.id === noteId) || n) : n);
+    if (noteId && !notes.find(x => x.id === noteId)) { const local = (window.__pendingNote || null); if (local) notes.push(local); }
+    if (!$('p-backlog').hidden) renderBacklog(); if (!$('p-sim').hidden) simulate();
+    renderInitList(); renderNotes();
+    if (!editingId && $('exTag').hidden && cur.area) $('corr').value = nextCorr(cur.area);
+    update();
+  }, () => setStatus('memory', 'Se perdió la conexión: descarga un respaldo antes de cerrar'));
+}
+</script>
+
+</body>
+</html>
